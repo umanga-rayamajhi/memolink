@@ -10,7 +10,6 @@ ApplicationWindow {
     height: 768
     title: "MemoLink"
     color: "#f5f5f5"
-
     property color primaryColor: "#ADD8E6"  // Light Blue
     property color accentColor: "#1E90FF"   // Dodger Blue
 
@@ -22,19 +21,21 @@ ApplicationWindow {
 
     Component {
         id: mainMenuComponent
-
         ColumnLayout {
             anchors.fill: parent
+            spacing: 0
 
             // Navbar
             Rectangle {
-                width: parent.width
+                Layout.fillWidth: true
                 height: 60
                 color: primaryColor
 
                 RowLayout {
                     anchors.fill: parent
-                    spacing: 20
+                    anchors.rightMargin: 20
+
+                    Item { Layout.fillWidth: true }
 
                     Button {
                         text: "Login"
@@ -77,19 +78,35 @@ ApplicationWindow {
                 }
             }
 
-            // Main page content
-            Rectangle {
+            // Main content area
+            RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                color: "white"
-                anchors.topMargin: 10
+                spacing: 0
 
-                Text {
-                    text: "MemoLink"
-                    font.pixelSize: 48
-                    font.bold: true
-                    color: accentColor
-                    anchors.centerIn: parent
+                // Left side with background image
+                Image {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: parent.width / 2
+                    source: "background.png"
+                    fillMode: Image.PreserveAspectCrop
+                }
+
+                // Right side with Memolink text
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: parent.width / 2
+                    color: "white"
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "Memolink"
+                        font.pixelSize: 48
+                        font.bold: true
+                        color: accentColor
+                    }
                 }
             }
         }

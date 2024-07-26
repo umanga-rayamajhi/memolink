@@ -1,135 +1,132 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import QtQuick.Dialogs
 
 Item {
-    id: userSignupPage
+    anchors.fill: parent
 
-    Rectangle {
+    RowLayout {
         anchors.fill: parent
-        color: "transparent"
+        spacing: 0
 
-        RowLayout {
-            anchors.fill: parent
-            spacing: 0
+        // Left side with background image
+        Image {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: parent.width / 2
+            source: "background.png"
+            fillMode: Image.PreserveAspectCrop
+        }
 
-            Rectangle {
-                Layout.fillHeight: true
-                Layout.preferredWidth: parent.width * 0.4
-                color: window.primaryColor
+        // Right side with signup form
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: parent.width / 2
+            color: window.primaryColor
 
-                ColumnLayout {
-                    anchors.centerIn: parent
-                    spacing: 20
+            ColumnLayout {
+                anchors.centerIn: parent
+                spacing: 20
+                width: parent.width * 0.6
 
-                    Image {
-                        source: "../../Pictures/Logo.png"
-                        Layout.alignment: Qt.AlignHCenter
-                        Layout.preferredWidth: Math.min(parent.width * 0.74, parent.height * 1.2)
-                        Layout.preferredHeight: Layout.preferredWidth
-                        fillMode: Image.PreserveAspectFit
+                Text {
+                    text: "Sign Up"
+                    font.family: window.fontFamily
+                    font.pixelSize: 32
+                    font.weight: Font.Bold
+                    color: window.accentColor
+                    Layout.alignment: Qt.AlignHCenter
+                }
+
+                CustomTextField {
+                    id: nameInput
+                    placeholderText: "Full Name"
+                    Layout.preferredWidth: parent.width * 0.6
+                }
+
+                CustomTextField {
+                    id: emailInput
+                    placeholderText: "Email"
+                    Layout.preferredWidth: parent.width * 0.6
+                }
+
+                CustomTextField {
+                    id: passwordInput
+                    placeholderText: "Password"
+                    echoMode: TextInput.Password
+                    Layout.preferredWidth: parent.width * 0.6
+                }
+
+                CustomTextField {
+                    id: confirmPasswordInput
+                    placeholderText: "Confirm Password"
+                    echoMode: TextInput.Password
+                    Layout.preferredWidth: parent.width * 0.6
+                }
+
+                Button {
+                    text: "Sign Up"
+                    Layout.preferredWidth: parent.width * 0.6
+                    Layout.preferredHeight: 50
+                    font.family: window.fontFamily
+                    font.pixelSize: 18
+                    onClicked: signUp()
+                    background: Rectangle {
+                        color: window.accentColor
+                        radius: 25
                     }
-
-                    Text {
-                        text: "Join BloodBound"
-                        font.pixelSize: Math.min(parent.width * 0.15, 36)
+                    contentItem: Text {
+                        text: parent.text
                         font.bold: true
                         color: "white"
-                        Layout.alignment: Qt.AlignHCenter
-                    }
-
-                    Text {
-                        text: "Create your account and start saving lives"
-                        font.pixelSize: Math.min(parent.width * 0.05, 18)
-                        color: "white"
-                        opacity: 0.8
-                        Layout.alignment: Qt.AlignHCenter
-                        wrapMode: Text.WordWrap
                         horizontalAlignment: Text.AlignHCenter
-                        Layout.preferredWidth: parent.width * 0.8
+                        verticalAlignment: Text.AlignVCenter
                     }
                 }
-            }
 
-            Rectangle {
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-                color: "white"
+                Button {
+                    text: "Login"
+                    Layout.preferredWidth: parent.width * 0.6
+                    Layout.preferredHeight: 40
+                    font.family: window.fontFamily
+                    font.pixelSize: 16
+                    background: Rectangle {
+                        color: "transparent"
+                        border.color: window.accentColor
+                        border.width: 2
+                        radius: 20
+                    }
+                    contentItem: Text {
+                        text: parent.text
+                        font.bold: true
+                        color: window.accentColor
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    onClicked: stackView.push("LoginPage.qml")
+                }
 
-                ScrollView {
-                    anchors.fill: parent
-                    clip: true
-
-                    ColumnLayout {
-                        anchors.centerIn: parent
-                        spacing: 20
-                        width: Math.min(parent.width * 0.7, 400)
-
-                        Text {
-                            text: "Sign Up"
-                            font.pixelSize: 32
-                            font.bold: true
-                            color: window.primaryColor
-                            Layout.alignment: Qt.AlignHCenter
-                        }
-
-                        CustomTextField {
-                            id: nameInput
-                            placeholderText: "Full Name"
-                            Layout.fillWidth: true
-                        }
-
-                        CustomTextField {
-                            id: emailInput
-                            placeholderText: "Email"
-                            Layout.fillWidth: true
-                        }
-
-                        CustomTextField {
-                            id: passwordInput
-                            placeholderText: "Password"
-                            echoMode: TextInput.Password
-                            Layout.fillWidth: true
-                        }
-
-                        CustomTextField {
-                            id: confirmPasswordInput
-                            placeholderText: "Confirm Password"
-                            echoMode: TextInput.Password
-                            Layout.fillWidth: true
-                        }
-
-                        Button {
-                            text: "Sign Up"
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 50
-                            font.pixelSize: 16
-                            font.bold: true
-                            onClicked: signUp()
-                            background: Rectangle {
-                                color: window.accentColor
-                                radius: 25
-                            }
-                            contentItem: Text {
-                                text: parent.text
-                                font: parent.font
-                                color: "white"
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                            }
-                        }
-
-                        Text {
-                            text: "Already have an account? Log in"
-                            color: window.primaryColor
-                            font.pixelSize: 14
-                            font.underline: true
-                            Layout.alignment: Qt.AlignHCenter
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: stackView.pop()
-                            }
-                        }
+                Button {
+                    text: "Back to Main Menu"
+                    Layout.preferredWidth: parent.width * 0.6
+                    Layout.preferredHeight: 40
+                    font.family: window.fontFamily
+                    font.pixelSize: 14
+                    onClicked: stackView.pop()
+                    background: Rectangle {
+                        color: "transparent"
+                        border.color: window.textColor
+                        border.width: 1
+                        radius: 20
+                    }
+                    contentItem: Text {
+                        text: parent.text
+                        font.bold: true
+                        color: window.textColor
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
                     }
                 }
             }
@@ -138,7 +135,7 @@ Item {
 
     Dialog {
         id: errorDialog
-        title: "Error"
+        title: "Signup Failed"
         standardButtons: Dialog.Ok
 
         contentItem: Text {
@@ -154,7 +151,7 @@ Item {
     component CustomTextField: TextField {
         font.pixelSize: 14
         background: Rectangle {
-            color: "#F0F0F0"
+            color: "#FFFFFF"
             radius: 5
             border.color: parent.activeFocus ? window.accentColor : "#CCCCCC"
             border.width: parent.activeFocus ? 2 : 1
@@ -165,44 +162,13 @@ Item {
         bottomPadding: 12
     }
 
-    component CustomComboBox: ComboBox {
-        id: comboBox
-        font.pixelSize: 14
-        background: Rectangle {
-            color: "#F0F0F0"
-            radius: 5
-            border.color: comboBox.activeFocus ? window.accentColor : "#CCCCCC"
-            border.width: comboBox.activeFocus ? 2 : 1
-        }
-        delegate: ItemDelegate {
-            width: comboBox.width
-            contentItem: Text {
-                text: modelData
-                color: "#333333"
-                font: comboBox.font
-                elide: Text.ElideRight
-                verticalAlignment: Text.AlignVCenter
-            }
-            highlighted: comboBox.highlightedIndex === index
-        }
-        contentItem: Text {
-            leftPadding: 10
-            rightPadding: 30
-            text: comboBox.displayText
-            font: comboBox.font
-            color: comboBox.pressed ? "#666666" : "#333333"
-            verticalAlignment: Text.AlignVCenter
-            elide: Text.ElideRight
-        }
-    }
-
     function signUp() {
         var name = nameInput.text;
         var email = emailInput.text;
         var password = passwordInput.text;
         var confirmPassword = confirmPasswordInput.text;
 
-        if (name.trim() === "" || email.trim() === "" || password.trim() === "" || confirmPassword.trim() === "" || bloodGroup === "") {
+        if (name.trim() === "" || email.trim() === "" || password.trim() === "" || confirmPassword.trim() === "") {
             errorText.text = "Please fill in all required fields.";
             errorDialog.open();
             return;
@@ -215,7 +181,7 @@ Item {
         }
 
         // Call the backend function to insert the user
-        var success = dbManager.insertUser(name, email, password, bloodGroup, healthInfo);
+        var success = dbManager.insertUser(name, email, password);
         if (success) {
             console.log("User signup successful");
             stackView.push("UserDashboardPage.qml");

@@ -9,9 +9,13 @@ ApplicationWindow {
     width: 1024
     height: 768
     title: "MemoLink"
-    color: "#f5f5f5"
-    property color primaryColor: "#ADD8E6"  // Light Blue
-    property color accentColor: "#1E90FF"   // Dodger Blue
+    color: "#0A192F"  // Dark blue background
+
+    property color primaryColor: "#0A192F"  // Dark blue
+    property color secondaryColor: "#172A45"  // Slightly lighter blue
+    property color accentColor: "#64FFDA"  // Teal accent
+    property color textColor: "#E6F1FF"  // Light blue-white for text
+    property string fontFamily: "Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif"
 
     StackView {
         id: stackView
@@ -21,36 +25,48 @@ ApplicationWindow {
 
     Component {
         id: mainMenuComponent
-        ColumnLayout {
+        Item {
             anchors.fill: parent
-            spacing: 0
 
             // Navbar
             Rectangle {
-                Layout.fillWidth: true
-                height: 60
-                color: primaryColor
+                id: navbar
+                width: parent.width
+                height: 70
+                color: secondaryColor
 
                 RowLayout {
                     anchors.fill: parent
-                    anchors.rightMargin: 20
+                    anchors.leftMargin: 30
+                    anchors.rightMargin: 30
+
+                    Text {
+                        text: "MemoLink"
+                        font.family: fontFamily
+                        font.pixelSize: 24
+                        font.weight: Font.Bold
+                        color: accentColor
+                    }
 
                     Item { Layout.fillWidth: true }
 
                     Button {
                         text: "Login"
+                        font.family: fontFamily
+                        font.pixelSize: 16
                         Layout.preferredWidth: 100
                         Layout.preferredHeight: 40
-                        font.pixelSize: 20
                         onClicked: stackView.push("LoginPage.qml")
                         background: Rectangle {
-                            color: accentColor
-                            radius: 30
+                            color: "transparent"
+                            border.color: accentColor
+                            border.width: 2
+                            radius: 5
                         }
                         contentItem: Text {
                             text: parent.text
-                            font.bold: true
-                            color: "white"
+                            font: parent.font
+                            color: accentColor
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
                         }
@@ -58,19 +74,19 @@ ApplicationWindow {
 
                     Button {
                         text: "Sign Up"
+                        font.family: fontFamily
+                        font.pixelSize: 16
                         Layout.preferredWidth: 100
                         Layout.preferredHeight: 40
-                        font.pixelSize: 20
                         onClicked: stackView.push("SignUpPage.qml")
                         background: Rectangle {
-                            color: "white"
-                            border.color: accentColor
-                            radius: 30
+                            color: accentColor
+                            radius: 5
                         }
                         contentItem: Text {
                             text: parent.text
-                            font.bold: true
-                            color: accentColor
+                            font: parent.font
+                            color: primaryColor
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
                         }
@@ -80,8 +96,10 @@ ApplicationWindow {
 
             // Main content area
             RowLayout {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+                anchors.top: navbar.bottom
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
                 spacing: 0
 
                 // Left side with background image
@@ -93,19 +111,51 @@ ApplicationWindow {
                     fillMode: Image.PreserveAspectCrop
                 }
 
-                // Right side with Memolink text
+                // Right side with Memolink text and description
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: parent.width / 2
-                    color: "white"
+                    color: primaryColor
 
-                    Text {
+                    ColumnLayout {
                         anchors.centerIn: parent
-                        text: "Memolink"
-                        font.pixelSize: 48
-                        font.bold: true
-                        color: accentColor
+                        spacing: 30
+                        width: parent.width * 0.8
+
+                        Text {
+                            text: "MemoLink"
+                            font.family: fontFamily
+                            font.pixelSize: 48
+                            font.weight: Font.Bold
+                            color: accentColor
+                            Layout.alignment: Qt.AlignHCenter
+                        }
+
+                        Text {
+                            text: "Your ultimate digital note-taking companion"
+                            font.family: fontFamily
+                            font.pixelSize: 24
+                            color: textColor
+                            opacity: 0.8
+                            horizontalAlignment: Text.AlignHCenter
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.fillWidth: true
+                            wrapMode: Text.WordWrap
+                        }
+
+                        Text {
+                            text: "Capture ideas instantly, organize thoughts effortlessly, and access your notes from anywhere. With intuitive features and seamless synchronization, stay productive and never miss a brilliant idea again."
+                            font.family: fontFamily
+                            font.pixelSize: 16
+                            color: textColor
+                            opacity: 0.6
+                            horizontalAlignment: Text.AlignHCenter
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.fillWidth: true
+                            wrapMode: Text.WordWrap
+                            lineHeight: 1.4
+                        }
                     }
                 }
             }

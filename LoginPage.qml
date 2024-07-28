@@ -2,9 +2,23 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Dialogs
+import QtQuick.Controls.Material 2.15
 
 Item {
+    id: root
+    property var dbManager
     anchors.fill: parent
+
+    Material.theme: Material.Dark
+    Material.accent: Material.Teal  // Adjust this to match your accentColor
+
+    Component.onCompleted: {
+        if (!root.dbManager) {
+            console.error("dbManager is not available in LoginPage")
+        } else {
+            console.log("dbManager is available in LoginPage")
+        }
+    }
 
     RowLayout {
         anchors.fill: parent
@@ -24,7 +38,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: parent.width / 2
-            color: window.primaryColor
+            color: Material.backgroundColor
 
             ColumnLayout {
                 anchors.centerIn: parent
@@ -36,41 +50,21 @@ Item {
                     font.family: window.fontFamily
                     font.pixelSize: 32
                     font.weight: Font.Bold
-                    color: window.accentColor
+                    color: Material.accentColor
                     Layout.alignment: Qt.AlignHCenter
                 }
 
-                TextField {
+                CustomTextField {
                     id: emailInput
                     placeholderText: "Email"
                     Layout.preferredWidth: parent.width * 0.6
-                    font.family: window.fontFamily
-                    font.pixelSize: 16
-                    background: Rectangle {
-                        color: "#FFFFFF"
-                        radius: 5
-                        border.color: emailInput.activeFocus ? window.accentColor : "#CCCCCC"
-                        border.width: emailInput.activeFocus ? 2 : 1
-                    }
-                    leftPadding: 10
-                    rightPadding: 10
                 }
 
-                TextField {
+                CustomTextField {
                     id: passwordInput
                     placeholderText: "Password"
                     echoMode: TextInput.Password
                     Layout.preferredWidth: parent.width * 0.6
-                    font.family: window.fontFamily
-                    font.pixelSize: 16
-                    background: Rectangle {
-                        color: "#FFFFFF"
-                        radius: 5
-                        border.color: passwordInput.activeFocus ? window.accentColor : "#CCCCCC"
-                        border.width: passwordInput.activeFocus ? 2 : 1
-                    }
-                    leftPadding: 10
-                    rightPadding: 10
                 }
 
                 Button {
@@ -79,29 +73,9 @@ Item {
                     Layout.preferredHeight: 50
                     font.family: window.fontFamily
                     font.pixelSize: 18
-                    onClicked: {
-                        var email = emailInput.text;
-                        var password = passwordInput.text;
-                        var success = dbManager.userLogin(email, password);
-                        if (success) {
-                            console.log("User login successful");
-                            stackView.push("UserDashboardPage.qml");
-                        } else {
-                            console.log("User login failed");
-                            errorDialog.open();
-                        }
-                    }
-                    background: Rectangle {
-                        color: window.accentColor
-                        radius: 25
-                    }
-                    contentItem: Text {
-                        text: parent.text
-                        font.bold: true
-                        color: "white"
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
+                    onClicked: login()
+                    Material.background: Material.accentColor
+                    Material.foreground: "white"
                 }
 
                 Button {
@@ -110,19 +84,8 @@ Item {
                     Layout.preferredHeight: 40
                     font.family: window.fontFamily
                     font.pixelSize: 16
-                    background: Rectangle {
-                        color: "transparent"
-                        border.color: window.accentColor
-                        border.width: 2
-                        radius: 20
-                    }
-                    contentItem: Text {
-                        text: parent.text
-                        font.bold: true
-                        color: window.accentColor
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
+                    Material.background: "transparent"
+                    Material.foreground: Material.accentColor
                     onClicked: stackView.push("SignUpPage.qml")
                 }
 
@@ -133,19 +96,8 @@ Item {
                     font.family: window.fontFamily
                     font.pixelSize: 14
                     onClicked: stackView.pop()
-                    background: Rectangle {
-                        color: "transparent"
-                        border.color: window.textColor
-                        border.width: 1
-                        radius: 20
-                    }
-                    contentItem: Text {
-                        text: parent.text
-                        font.bold: true
-                        color: window.textColor
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
+                    Material.background: "transparent"
+                    Material.foreground: Material.foreground
                 }
             }
         }
@@ -163,5 +115,41 @@ Item {
         }
 
         onAccepted: errorDialog.close()
+    }
+
+    // Custom Components
+    component CustomTextField: TextField {
+        font.pixelSize: 14
+        font.family: window.fontFamily
+        Material.accent: Material.accentColor
+        Material.foreground: Material.foreground
+    }
+
+    function login() {
+        var email = emailInput.text;
+        var password = passwordInput.text;
+
+        if (email.trim() === "" || password.trim() === "") {
+            errorDialog.contentItem.text = "Please fill in all required fields.";
+            errorDialog.open();
+            return;
+        }
+
+        if (!root.dbManager) {
+            console.error("dbManager is not available");
+            errorDialog.contentItem.text = "An error occurred. Please try again later.";
+            errorDialog.open();
+            return;
+        }
+
+        var success = root.dbManager.loginUser(email, password);
+        if (success) {
+            console.log("User login successful");
+            stackView.push("UserDashboardPage.qml");
+        } else {
+            console.log("User login failed");
+            errorDialog.contentItem.text = "Invalid email or password. Please try again.";
+            errorDialog.open();
+        }
     }
 }

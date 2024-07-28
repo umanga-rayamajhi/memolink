@@ -9,9 +9,11 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    databasemanager.cpp \
     main.cpp
 
-HEADERS +=
+HEADERS += \
+    databasemanager.h
 
 FORMS +=
 
@@ -24,7 +26,9 @@ DISTFILES += \
     LoginPage.qml \
     MainView.qml \
     MainWindow.qml \
-    SignUpPage.qml
+    SignUpPage.qml \
 
 RESOURCES += \
     Resources.qrc
+
+QT += quick sql

@@ -11,6 +11,7 @@ ApplicationWindow {
     title: "MemoLink"
     color: "#0A192F"  // Dark blue background
 
+    property var dbManager: null
     property color primaryColor: "#0A192F"  // Dark blue
     property color secondaryColor: "#172A45"  // Slightly lighter blue
     property color accentColor: "#64FFDA"  // Teal accent
@@ -56,7 +57,7 @@ ApplicationWindow {
                         font.pixelSize: 16
                         Layout.preferredWidth: 100
                         Layout.preferredHeight: 40
-                        onClicked: stackView.push("LoginPage.qml")
+                        onClicked: stackView.push("LoginPage.qml", {dbManager: window.dbManager})
                         background: Rectangle {
                             color: "transparent"
                             border.color: accentColor
@@ -78,7 +79,7 @@ ApplicationWindow {
                         font.pixelSize: 16
                         Layout.preferredWidth: 100
                         Layout.preferredHeight: 40
-                        onClicked: stackView.push("SignUpPage.qml")
+                        onClicked: stackView.push("SignUpPage.qml", {dbManager: window.dbManager})
                         background: Rectangle {
                             color: accentColor
                             radius: 5

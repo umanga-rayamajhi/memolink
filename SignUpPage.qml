@@ -2,9 +2,23 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Dialogs
+import QtQuick.Controls.Material 2.15
 
 Item {
+    id: root
+    property var dbManager
     anchors.fill: parent
+
+    Material.theme: Material.Dark
+    Material.accent: Material.Teal  // Adjust this to match your accentColor
+
+    Component.onCompleted: {
+        if (!root.dbManager) {
+            console.error("dbManager is not available in SignUpPage")
+        } else {
+            console.log("dbManager is available in SignUpPage")
+        }
+    }
 
     RowLayout {
         anchors.fill: parent
@@ -24,7 +38,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: parent.width / 2
-            color: window.primaryColor
+            color: Material.backgroundColor
 
             ColumnLayout {
                 anchors.centerIn: parent
@@ -36,7 +50,7 @@ Item {
                     font.family: window.fontFamily
                     font.pixelSize: 32
                     font.weight: Font.Bold
-                    color: window.accentColor
+                    color: Material.accentColor
                     Layout.alignment: Qt.AlignHCenter
                 }
 
@@ -73,17 +87,8 @@ Item {
                     font.family: window.fontFamily
                     font.pixelSize: 18
                     onClicked: signUp()
-                    background: Rectangle {
-                        color: window.accentColor
-                        radius: 25
-                    }
-                    contentItem: Text {
-                        text: parent.text
-                        font.bold: true
-                        color: "white"
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
+                    Material.background: Material.accentColor
+                    Material.foreground: "white"
                 }
 
                 Button {
@@ -92,19 +97,8 @@ Item {
                     Layout.preferredHeight: 40
                     font.family: window.fontFamily
                     font.pixelSize: 16
-                    background: Rectangle {
-                        color: "transparent"
-                        border.color: window.accentColor
-                        border.width: 2
-                        radius: 20
-                    }
-                    contentItem: Text {
-                        text: parent.text
-                        font.bold: true
-                        color: window.accentColor
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
+                    Material.background: "transparent"
+                    Material.foreground: Material.accentColor
                     onClicked: stackView.push("LoginPage.qml")
                 }
 
@@ -115,19 +109,8 @@ Item {
                     font.family: window.fontFamily
                     font.pixelSize: 14
                     onClicked: stackView.pop()
-                    background: Rectangle {
-                        color: "transparent"
-                        border.color: window.textColor
-                        border.width: 1
-                        radius: 20
-                    }
-                    contentItem: Text {
-                        text: parent.text
-                        font.bold: true
-                        color: window.textColor
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
+                    Material.background: "transparent"
+                    Material.foreground: Material.foreground
                 }
             }
         }
@@ -147,19 +130,28 @@ Item {
         onAccepted: errorDialog.close()
     }
 
+    Dialog {
+        id: successDialog
+        title: "Signup Successful"
+        standardButtons: Dialog.Ok
+
+        contentItem: Text {
+            text: "Your account has been created successfully. You can now log in."
+            color: "#008000"
+            font.pixelSize: 14
+        }
+
+        onAccepted: {
+            successDialog.close();
+            stackView.push("LoginPage.qml");
+        }
+    }
+
     // Custom Components
     component CustomTextField: TextField {
         font.pixelSize: 14
-        background: Rectangle {
-            color: "#FFFFFF"
-            radius: 5
-            border.color: parent.activeFocus ? window.accentColor : "#CCCCCC"
-            border.width: parent.activeFocus ? 2 : 1
-        }
-        leftPadding: 10
-        rightPadding: 10
-        topPadding: 12
-        bottomPadding: 12
+        Material.accent: Material.accentColor
+        Material.foreground: Material.foreground
     }
 
     function signUp() {
@@ -180,14 +172,21 @@ Item {
             return;
         }
 
-        // Call the backend function to insert the user
-        var success = dbManager.insertUser(name, email, password);
+        if (!root.dbManager) {
+            console.error("dbManager is not available");
+            errorText.text = "An error occurred. Please try again later.";
+            errorDialog.open();
+            return;
+        }
+
+        // Call the backend function to register the user
+        var success = root.dbManager.registerUser(name, email, password);
         if (success) {
             console.log("User signup successful");
-            stackView.push("UserDashboardPage.qml");
+            successDialog.open();
         } else {
             console.log("User signup failed");
-            errorText.text = "Signup failed. Please try again.";
+            errorText.text = "Signup failed. Email may already be in use.";
             errorDialog.open();
         }
     }

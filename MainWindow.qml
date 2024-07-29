@@ -1,10 +1,18 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
-import QtQuick.Window 2.15
 
-Page{
+Page {
     id: mainwindow
+    background: Rectangle {
+        color: "#0A192F"  // Dark blue background
+    }
+
+    property color accentColor: "#64FFDA"
+    property color textColor: "#CCD6F6"
+    property color lightBackgroundColor: "#F8F8F8"
+    property string fontFamily: "Roboto"
+
     Drawer {
         id: sidebar
         width: 250
@@ -12,209 +20,222 @@ Page{
         visible: false
         edge: Qt.LeftEdge
         modal: true
+        background: Rectangle {
+            color: "#172A45"  // Slightly lighter blue for sidebar
+        }
 
-        Column {
-            spacing: 10
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 20
+            anchors.margins: 20
 
             Label {
-                text: "Modes"
-                font.pointSize: 24
-                color: "#2c3e50"  // Dark text
+                text: "Menu"
+                font.family: fontFamily
+                font.pixelSize: 24
+                color: accentColor
             }
 
-            Label {
-                text: "Smart Mode"
-                font.pointSize: 18
-                color: "#2c3e50"  // Dark text
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: openSmartMode()
+            Button {
+                text: "Notes"
+                font.family: fontFamily
+                font.pixelSize: 18
+                Layout.fillWidth: true
+                onClicked: {
+                    stackLayout.currentIndex = 0
+                    sidebar.close()
+                }
+                background: Rectangle {
+                    color: stackLayout.currentIndex === 0 ? accentColor : "transparent"
+                    radius: 5
+                }
+                contentItem: Text {
+                    text: parent.text
+                    font: parent.font
+                    color: stackLayout.currentIndex === 0 ? "#172A45" : textColor
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
                 }
             }
 
-            // Add more sidebar content here as needed
+            Button {
+                text: "To-Do List"
+                font.family: fontFamily
+                font.pixelSize: 18
+                Layout.fillWidth: true
+                onClicked: {
+                    stackLayout.currentIndex = 1
+                    sidebar.close()
+                }
+                background: Rectangle {
+                    color: stackLayout.currentIndex === 1 ? accentColor : "transparent"
+                    radius: 5
+                }
+                contentItem: Text {
+                    text: parent.text
+                    font: parent.font
+                    color: stackLayout.currentIndex === 1 ? "#172A45" : textColor
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+            }
         }
     }
 
-    // Edit bar with font controls and list creation
-    RowLayout {
-        id: editBar
-        width: parent.width
-        height: 40
-        Layout.alignment: Qt.AlignTop
-        spacing: 10
+    ColumnLayout {
+        anchors.fill: parent
+        spacing: 0
 
-        // Menu icon
-        Button {
-            text: "☰"
-            onClicked: sidebar.open()
-            font.pointSize: 18
-            background: Rectangle {
-                color: "transparent"
-                border.color: "transparent"
-            }
-        }
-
-        // Font size controls and text formatting controls
-        RowLayout {
-            spacing: 5
-
-            Button {
-                text: "-"
-                onClicked: decreaseFontSize()
-            }
-
-            TextField {
-                id: fontSizeField
-                width: 40
-                text: "18"
-                validator: IntValidator { bottom: 1; top: 100 }
-                inputMethodHints: Qt.ImhDigitsOnly
-                onTextChanged: setFontSizeFromField()
-                horizontalAlignment: Text.AlignHCenter
-            }
-
-            Button {
-                text: "+"
-                onClicked: increaseFontSize()
-            }
-        }
-
-        Button {
-            text: "B"
-            font.bold: true
-            onClicked: toggleBold()
-        }
-        Button {
-            text: "I"
-            font.italic: true
-            onClicked: toggleItalic()
-        }
-        Button {
-            text: "U"
-            font.underline: true
-            onClicked: toggleUnderline()
-        }
-        Button {
-            text: "Create List"
-            onClicked: createList()
-        }
-
-        // Spacer to push all icons to the left
+        // Navbar
         Rectangle {
             Layout.fillWidth: true
-            color: "transparent"
-        }
-    }
+            height: 70
+            color: "#172A45"  // Slightly lighter blue for navbar
 
-    Rectangle {
-        anchors.top: editBar.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        color: "#f8f8f8"  // Light background color
-
-        Column {
-            anchors.fill: parent
-            spacing: 10
-            padding: 10
-
-            // Title
-            Rectangle {
-                width: parent.width
-                height: 50
-                color: "#3498db"  // Primary color
-                border.color: "#2980b9"  // Darker primary color
-                radius: 5
-
-                Label {
-                    text: "MEMOLINK"
-                    font.pointSize: 24
-                    color: "#ffffff"  // White text
-                    anchors.centerIn: parent
-                    font.bold: true
-                }
-            }
-
-            Row {
-                anchors.horizontalCenter: parent.horizontalCenter
+            RowLayout {
                 anchors.fill: parent
+                anchors.leftMargin: 20
+                anchors.rightMargin: 20
                 spacing: 10
+
+                Button {
+                    text: "☰"
+                    onClicked: sidebar.open()
+                    font.pixelSize: 24
+                    background: Rectangle {
+                        color: "transparent"
+                    }
+                    contentItem: Text {
+                        text: parent.text
+                        font: parent.font
+                        color: accentColor
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
+
+                Text {
+                    text: "MEMOLINK"
+                    font.family: fontFamily
+                    font.pixelSize: 24
+                    font.weight: Font.Bold
+                    color: accentColor
+                }
+
+                Item { Layout.fillWidth: true }
+
+                // Font controls
+                Row {
+                    spacing: 5
+                    CustomButton { text: "-"; onClicked: decreaseFontSize() }
+                    TextField {
+                        id: fontSizeField
+                        width: 40
+                        text: "18"
+                        validator: IntValidator { bottom: 1; top: 100 }
+                        inputMethodHints: Qt.ImhDigitsOnly
+                        onTextChanged: setFontSizeFromField()
+                        horizontalAlignment: Text.AlignHCenter
+                        background: Rectangle {
+                            color: lightBackgroundColor
+                            radius: 4
+                        }
+                    }
+                    CustomButton { text: "+"; onClicked: increaseFontSize() }
+                }
+
+                CustomButton { text: "B"; font.bold: true; onClicked: toggleBold() }
+                CustomButton { text: "I"; font.italic: true; onClicked: toggleItalic() }
+                CustomButton { text: "U"; font.underline: true; onClicked: toggleUnderline() }
+                CustomButton { text: "Create List"; onClicked: createList() }
+            }
+        }
+
+        // Main content area
+        StackLayout {
+            id: stackLayout
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            // Notes Page
+            RowLayout {
+                spacing: 0
 
                 // Side panel
                 Rectangle {
-                    width: parent.width * 0.25
-                    height: parent.height
-                    color: "#ecf0f1"  // Light gray background
-                    radius: 5
+                    Layout.preferredWidth: parent.width * 0.25
+                    Layout.fillHeight: true
+                    color: "#172A45"  // Slightly lighter blue for side panel
 
-                    Column {
+                    ColumnLayout {
                         anchors.fill: parent
-                        spacing: 10
-                        padding: 10
+                        anchors.margins: 20
+                        spacing: 20
 
                         Label {
                             text: "Previous Files"
-                            font.pointSize: 18
-                            color: "#2c3e50"  // Dark text
+                            font.family: fontFamily
+                            font.pixelSize: 20
+                            color: accentColor
                         }
 
                         ListView {
-                            width: parent.width
-                            height: parent.height - 50
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
                             model: ListModel { }
-
-                            delegate: Item {
+                            delegate: ItemDelegate {
                                 width: parent.width
                                 height: 40
-
-                                Text {
+                                contentItem: Text {
                                     text: ""
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    font.pointSize: 16
-                                    color: "#2c3e50"  // Dark text
+                                    font.family: fontFamily
+                                    font.pixelSize: 16
+                                    color: textColor
+                                    verticalAlignment: Text.AlignVCenter
                                 }
                             }
                         }
                     }
                 }
 
-                // Main content area
-                Rectangle {
-                    width: parent.width * 0.75
-                    height: parent.height
-                    color: "#ffffff"  // White background
-                    radius: 5
+                // Notes area
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    spacing: 10
+                    anchors.margins: 20
 
-                    Column {
-                        anchors.fill: parent
-                        spacing: 10
-                        padding: 10
-
-                        TextField {
-                            id: titleField
-                            placeholderText: "Title"
-                            font.pointSize: 18
-                            width: parent.width
-                            color: "#2c3e50"  // Dark text
-                            background: Rectangle {
-                                color: "#ecf0f1"  // Light gray background
-                                radius: 5
-                            }
+                    TextField {
+                        id: titleField
+                        Layout.fillWidth: true
+                        placeholderText: "Title"
+                        font.family: fontFamily
+                        font.pixelSize: 24
+                        color: "#2c3e50"
+                        background: Rectangle {
+                            color: lightBackgroundColor
+                            radius: 5
                         }
+                    }
+
+                    ScrollView {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        clip: true
 
                         TextArea {
                             id: notesTextArea
-                            placeholderText: "Notes..."
                             width: parent.width
-                            height: parent.height - titleField.height - editBar.height - 40 // Adjusted height calculation
-                            color: "#2c3e50"  // Dark text
+                            placeholderText: "Notes..."
+                            font.family: fontFamily
+                            font.pixelSize: 18
+                            color: "#2c3e50"
                             background: Rectangle {
-                                color: "#ecf0f1"  // Light gray background
+                                color: lightBackgroundColor
                                 radius: 5
                             }
+                            wrapMode: TextEdit.Wrap
 
-                            // Handling key presses
                             Keys.onPressed: {
                                 if (event.key === Qt.Key_B && event.modifiers & Qt.ControlModifier) {
                                     toggleBold();
@@ -225,8 +246,102 @@ Page{
                                 } else if (event.key === Qt.Key_U && event.modifiers & Qt.ControlModifier) {
                                     toggleUnderline();
                                     event.accepted = true;
-                                } else {
-                                    event.accepted = false; // Allow the default behavior for other keys
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // To-Do List Page
+            Rectangle {
+                color: "#172A45"
+
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: 20
+                    spacing: 20
+
+                    Label {
+                        text: "To-Do List"
+                        font.family: fontFamily
+                        font.pixelSize: 24
+                        color: accentColor
+                    }
+
+                    Row {
+                        spacing: 10
+                        TextField {
+                            id: todoInput
+                            width: 300
+                            placeholderText: "Add a new task"
+                            font.family: fontFamily
+                            font.pixelSize: 16
+                            color: "#2c3e50"
+                            background: Rectangle {
+                                color: lightBackgroundColor
+                                radius: 5
+                            }
+                        }
+                        Button {
+                            text: "Add"
+                            onClicked: {
+                                if (todoInput.text.trim() !== "") {
+                                    todoListModel.append({task: todoInput.text, completed: false})
+                                    todoInput.text = ""
+                                }
+                            }
+                            background: Rectangle {
+                                color: accentColor
+                                radius: 5
+                            }
+                            contentItem: Text {
+                                text: parent.text
+                                font.family: fontFamily
+                                font.pixelSize: 16
+                                color: "#172A45"
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                        }
+                    }
+
+                    ListView {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        model: ListModel { id: todoListModel }
+                        delegate: RowLayout {
+                            width: parent.width
+                            CheckBox {
+                                checked: completed
+                                onCheckedChanged: {
+                                    todoListModel.setProperty(index, "completed", checked)
+                                }
+                            }
+                            Text {
+                                text: task
+                                font.family: fontFamily
+                                font.pixelSize: 16
+                                color: completed ? Qt.rgba(textColor.r, textColor.g, textColor.b, 0.5) : textColor
+                                font.strikeout: completed
+                                Layout.fillWidth: true
+                            }
+                            Button {
+                                text: "Delete"
+                                onClicked: todoListModel.remove(index)
+                                background: Rectangle {
+                                    color: "transparent"
+                                    border.color: accentColor
+                                    border.width: 1
+                                    radius: 5
+                                }
+                                contentItem: Text {
+                                    text: parent.text
+                                    font.family: fontFamily
+                                    font.pixelSize: 14
+                                    color: accentColor
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
                                 }
                             }
                         }
@@ -236,65 +351,23 @@ Page{
         }
     }
 
-    // Smart Mode window
-    Window {
-        id: smartModeWindow
-        width: 400
-        height: 300
-        visible: false
-        title: "Smart Mode"
-        flags: Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
-        color: "#ffffff"  // White background
-
-        Column {
-            anchors.fill: parent
-            spacing: 10
-            padding: 10
-
-            TextField {
-                id: smartModeTitleField
-                placeholderText: "Title"
-                font.pointSize: 18
-                width: parent.width
-                color: "#2c3e50"  // Dark text
-                background: Rectangle {
-                    color: "#ecf0f1"  // Light gray background
-                    radius: 5
-                }
-            }
-
-            TextArea {
-                id: smartModeNotesTextArea
-                placeholderText: "Notes..."
-                width: parent.width
-                height: parent.height - smartModeTitleField.height - 20
-                color: "#2c3e50"  // Dark text
-                background: Rectangle {
-                    color: "#ecf0f1"  // Light gray background
-                    radius: 5
-                }
-                focus: true // Make sure the TextArea is focused
-            }
+    // Custom button component
+    component CustomButton: Button {
+        contentItem: Text {
+            text: parent.text
+            font: parent.font
+            color: parent.pressed ? "#172A45" : accentColor
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
         }
-
-        MouseArea {
-            id: dragArea
-            anchors.fill: parent
-            drag.target: parent
-
-            onPressed: {
-                dragArea.drag.start()
-            }
+        background: Rectangle {
+            implicitWidth: 40
+            implicitHeight: 40
+            color: parent.pressed ? accentColor : "transparent"
+            border.color: accentColor
+            border.width: 1
+            radius: 4
         }
-
-        Drag.active: dragArea.drag.active
-        Drag.hotSpot.x: dragArea.width / 2
-        Drag.hotSpot.y: dragArea.height / 2
-        Drag.source: dragArea
-    }
-
-    function openSmartMode() {
-        smartModeWindow.visible = true;
     }
 
     function increaseFontSize() {

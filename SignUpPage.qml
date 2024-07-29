@@ -99,7 +99,7 @@ Item {
                     font.pixelSize: 16
                     Material.background: "transparent"
                     Material.foreground: Material.accentColor
-                    onClicked: stackView.push("LoginPage.qml")
+                    onClicked: stackView.push("LoginPage.qml", { dbManager: root.dbManager })
                 }
 
                 Button {
@@ -143,13 +143,14 @@ Item {
 
         onAccepted: {
             successDialog.close();
-            stackView.push("LoginPage.qml");
+            stackView.push("LoginPage.qml", { dbManager: root.dbManager });
         }
     }
 
     // Custom Components
     component CustomTextField: TextField {
         font.pixelSize: 14
+        font.family: window.fontFamily
         Material.accent: Material.accentColor
         Material.foreground: Material.foreground
     }
@@ -179,7 +180,6 @@ Item {
             return;
         }
 
-        // Call the backend function to register the user
         var success = root.dbManager.registerUser(name, email, password);
         if (success) {
             console.log("User signup successful");

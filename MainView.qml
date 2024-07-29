@@ -1,31 +1,38 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
-import QtQuick.Window 2.15
+import QtQuick.Controls.Material 2.15
 
 ApplicationWindow {
     id: window
     visible: true
     width: 1024
     height: 768
-    title: "MemoLink"
-    color: "#0A192F"  // Dark blue background
+    title: qsTr("MemoLink")
 
-    property var dbManager: null
-    property color primaryColor: "#0A192F"  // Dark blue
-    property color secondaryColor: "#172A45"  // Slightly lighter blue
-    property color accentColor: "#64FFDA"  // Teal accent
-    property color textColor: "#E6F1FF"  // Light blue-white for text
-    property string fontFamily: "Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif"
+    property string fontFamily: "Roboto"
+    Material.theme: Material.Dark
+    Material.accent: "#64FFDA"
+    Material.primary: "#0A192F"
+    Material.background: "#0A192F"
+    Material.foreground: "#CCD6F6"
+
+    Component.onCompleted: {
+        if (dbManager) {
+            console.log("dbManager is available in MainView")
+        } else {
+            console.error("dbManager is not available in MainView")
+        }
+    }
 
     StackView {
         id: stackView
         anchors.fill: parent
-        initialItem: mainMenuComponent
+        initialItem: mainMenu
     }
 
     Component {
-        id: mainMenuComponent
+        id: mainMenu
         Item {
             anchors.fill: parent
 
@@ -34,7 +41,7 @@ ApplicationWindow {
                 id: navbar
                 width: parent.width
                 height: 70
-                color: secondaryColor
+                color: Material.primary
 
                 RowLayout {
                     anchors.fill: parent
@@ -43,54 +50,24 @@ ApplicationWindow {
 
                     Text {
                         text: "MemoLink"
-                        font.family: fontFamily
+                        font.family: window.fontFamily
                         font.pixelSize: 24
                         font.weight: Font.Bold
-                        color: accentColor
+                        color: Material.accent
                     }
 
                     Item { Layout.fillWidth: true }
 
-                    Button {
+                    CustomButton {
                         text: "Login"
-                        font.family: fontFamily
-                        font.pixelSize: 16
-                        Layout.preferredWidth: 100
-                        Layout.preferredHeight: 40
-                        onClicked: stackView.push("LoginPage.qml", {dbManager: window.dbManager})
-                        background: Rectangle {
-                            color: "transparent"
-                            border.color: accentColor
-                            border.width: 2
-                            radius: 5
-                        }
-                        contentItem: Text {
-                            text: parent.text
-                            font: parent.font
-                            color: accentColor
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
+                        onClicked: stackView.push("LoginPage.qml", { dbManager: dbManager })
+                        outlined: true
                     }
 
-                    Button {
+                    CustomButton {
                         text: "Sign Up"
-                        font.family: fontFamily
-                        font.pixelSize: 16
-                        Layout.preferredWidth: 100
-                        Layout.preferredHeight: 40
-                        onClicked: stackView.push("SignUpPage.qml", {dbManager: window.dbManager})
-                        background: Rectangle {
-                            color: accentColor
-                            radius: 5
-                        }
-                        contentItem: Text {
-                            text: parent.text
-                            font: parent.font
-                            color: primaryColor
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
+                        onClicked: stackView.push("SignUpPage.qml", { dbManager: dbManager })
+                        outlined: false
                     }
                 }
             }
@@ -112,12 +89,12 @@ ApplicationWindow {
                     fillMode: Image.PreserveAspectCrop
                 }
 
-                // Right side with Memolink text and description
+                // Right side with MemoLink text and description
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: parent.width / 2
-                    color: primaryColor
+                    color: Material.background
 
                     ColumnLayout {
                         anchors.centerIn: parent
@@ -125,41 +102,59 @@ ApplicationWindow {
                         width: parent.width * 0.8
 
                         Text {
-                            text: "MemoLink"
-                            font.family: fontFamily
+                            text: "Welcome to MemoLink"
+                            font.family: window.fontFamily
                             font.pixelSize: 48
                             font.weight: Font.Bold
-                            color: accentColor
+                            color: Material.accent
                             Layout.alignment: Qt.AlignHCenter
                         }
 
                         Text {
-                            text: "Your ultimate digital note-taking companion"
-                            font.family: fontFamily
-                            font.pixelSize: 24
-                            color: textColor
-                            opacity: 0.8
-                            horizontalAlignment: Text.AlignHCenter
-                            Layout.alignment: Qt.AlignHCenter
-                            Layout.fillWidth: true
+                            text: "Capture ideas instantly, organize thoughts effortlessly, and access your notes from anywhere."
+                            font.family: window.fontFamily
+                            font.pixelSize: 18
+                            color: Material.foreground
                             wrapMode: Text.WordWrap
+                            horizontalAlignment: Text.AlignHCenter
+                            Layout.fillWidth: true
                         }
 
                         Text {
-                            text: "Capture ideas instantly, organize thoughts effortlessly, and access your notes from anywhere. With intuitive features and seamless synchronization, stay productive and never miss a brilliant idea again."
-                            font.family: fontFamily
+                            text: "With intuitive features and seamless synchronization, stay productive and never miss a brilliant idea again."
+                            font.family: window.fontFamily
                             font.pixelSize: 16
-                            color: textColor
-                            opacity: 0.6
-                            horizontalAlignment: Text.AlignHCenter
-                            Layout.alignment: Qt.AlignHCenter
-                            Layout.fillWidth: true
+                            color: Qt.rgba(Material.foreground.r, Material.foreground.g, Material.foreground.b, 0.7)
                             wrapMode: Text.WordWrap
-                            lineHeight: 1.4
+                            horizontalAlignment: Text.AlignHCenter
+                            Layout.fillWidth: true
                         }
                     }
                 }
             }
+        }
+    }
+
+    // Custom button component
+    component CustomButton: Button {
+        property bool outlined: false
+
+        contentItem: Text {
+            text: parent.text
+            font.family: window.fontFamily
+            font.pixelSize: 16
+            color: outlined ? Material.accent : Material.primary
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+        }
+
+        background: Rectangle {
+            implicitWidth: 100
+            implicitHeight: 40
+            color: outlined ? "transparent" : Material.accent
+            border.color: Material.accent
+            border.width: outlined ? 2 : 0
+            radius: 4
         }
     }
 }

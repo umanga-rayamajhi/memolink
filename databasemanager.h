@@ -1,8 +1,7 @@
-#ifndef DATABASEMANAGER_H
-#define DATABASEMANAGER_H
+#pragma once
 
 #include <QObject>
-#include <QtSql/QSqlDatabase>
+#include <QSqlDatabase>
 
 class DatabaseManager : public QObject
 {
@@ -10,15 +9,13 @@ class DatabaseManager : public QObject
 
 public:
     explicit DatabaseManager(QObject *parent = nullptr);
-    virtual ~DatabaseManager();
+    ~DatabaseManager();
 
-    Q_INVOKABLE bool initializeDatabase();
     Q_INVOKABLE bool registerUser(const QString &name, const QString &email, const QString &password);
     Q_INVOKABLE bool loginUser(const QString &email, const QString &password);
 
 private:
     QSqlDatabase m_db;
-    QString m_dbPath;  // Add this line
+    bool initDatabase();
+    bool openDatabase();
 };
-
-#endif // DATABASEMANAGER_H

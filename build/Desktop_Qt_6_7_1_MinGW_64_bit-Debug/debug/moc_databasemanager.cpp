@@ -36,9 +36,8 @@ namespace {
 struct qt_meta_stringdata_CLASSDatabaseManagerENDCLASS_t {};
 constexpr auto qt_meta_stringdata_CLASSDatabaseManagerENDCLASS = QtMocHelpers::stringData(
     "DatabaseManager",
-    "initializeDatabase",
-    "",
     "registerUser",
+    "",
     "name",
     "email",
     "password",
@@ -55,7 +54,7 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSDatabaseManagerENDCLASS[] = {
       12,       // revision
        0,       // classname
        0,    0, // classinfo
-       3,   14, // methods
+       2,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -63,14 +62,12 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSDatabaseManagerENDCLASS[] = {
        0,       // signalCount
 
  // methods: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    0,   32,    2, 0x02,    1 /* Public */,
-       3,    3,   33,    2, 0x02,    2 /* Public */,
-       7,    2,   40,    2, 0x02,    6 /* Public */,
+       1,    3,   26,    2, 0x02,    1 /* Public */,
+       6,    2,   33,    2, 0x02,    5 /* Public */,
 
  // methods: parameters
-    QMetaType::Bool,
-    QMetaType::Bool, QMetaType::QString, QMetaType::QString, QMetaType::QString,    4,    5,    6,
-    QMetaType::Bool, QMetaType::QString, QMetaType::QString,    5,    6,
+    QMetaType::Bool, QMetaType::QString, QMetaType::QString, QMetaType::QString,    3,    4,    5,
+    QMetaType::Bool, QMetaType::QString, QMetaType::QString,    4,    5,
 
        0        // eod
 };
@@ -84,8 +81,6 @@ Q_CONSTINIT const QMetaObject DatabaseManager::staticMetaObject = { {
     qt_incomplete_metaTypeArray<qt_meta_stringdata_CLASSDatabaseManagerENDCLASS_t,
         // Q_OBJECT / Q_GADGET
         QtPrivate::TypeAndForceComplete<DatabaseManager, std::true_type>,
-        // method 'initializeDatabase'
-        QtPrivate::TypeAndForceComplete<bool, std::false_type>,
         // method 'registerUser'
         QtPrivate::TypeAndForceComplete<bool, std::false_type>,
         QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
@@ -105,11 +100,9 @@ void DatabaseManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
         auto *_t = static_cast<DatabaseManager *>(_o);
         (void)_t;
         switch (_id) {
-        case 0: { bool _r = _t->initializeDatabase();
+        case 0: { bool _r = _t->registerUser((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QString>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<QString>>(_a[3])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 1: { bool _r = _t->registerUser((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QString>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<QString>>(_a[3])));
-            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 2: { bool _r = _t->loginUser((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QString>>(_a[2])));
+        case 1: { bool _r = _t->loginUser((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QString>>(_a[2])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
         default: ;
         }
@@ -135,13 +128,13 @@ int DatabaseManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 3)
+        if (_id < 2)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 3;
+        _id -= 2;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 3)
+        if (_id < 2)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 3;
+        _id -= 2;
     }
     return _id;
 }

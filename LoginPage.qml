@@ -145,7 +145,7 @@ Item {
         var success = root.dbManager.loginUser(email, password);
         if (success) {
             console.log("User login successful");
-            stackView.push("UserDashboardPage.qml");
+            stackView.push("MainWindow.qml");
         } else {
             console.log("User login failed");
             errorDialog.contentItem.text = "Invalid email or password. Please try again.";

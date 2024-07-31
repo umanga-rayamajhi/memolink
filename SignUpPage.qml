@@ -9,6 +9,8 @@ Item {
     property var dbManager
     anchors.fill: parent
 
+    signal registrationSuccessful(int userId)
+
     Material.theme: Material.Dark
     Material.accent: Material.Teal  // Adjust this to match your accentColor
 
@@ -108,7 +110,7 @@ Item {
                     Layout.preferredHeight: 40
                     font.family: window.fontFamily
                     font.pixelSize: 14
-                    onClicked: stackView.pop()
+                    onClicked: stackView.pop("../../MainView.qml")
                     Material.background: "transparent"
                     Material.foreground: Material.foreground
                 }
@@ -180,9 +182,10 @@ Item {
             return;
         }
 
-        var success = root.dbManager.registerUser(name, email, password);
-        if (success) {
+        var userId = root.dbManager.registerUser(name, email, password);
+        if (userId > 0) {
             console.log("User signup successful");
+            registrationSuccessful(userId);  // Emit the signal with the userId
             successDialog.open();
         } else {
             console.log("User signup failed");

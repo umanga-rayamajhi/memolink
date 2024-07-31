@@ -4,22 +4,31 @@ import QtQuick.Layouts 1.15
 
 Page {
     id: mainwindow
-    background: Rectangle {
-        color: "#0A192F"  // Dark blue background
-    }
+    title: "MemoLink"
 
     property color accentColor: "#64FFDA"
     property color textColor: "#CCD6F6"
     property color lightBackgroundColor: "#F8F8F8"
     property string fontFamily: "Roboto"
+    property bool isLoggedIn: false
+    property var dbManager
+    property int currentUserId: -1
+    property bool showingDeletedFiles: false
+
+    background: Rectangle {
+        color: "#0A192F"  // Dark blue background
+    }
+
+    ListModel { id: savedFilesModel }
+    ListModel { id: deletedFilesModel }
 
     Drawer {
         id: sidebar
         width: 250
         height: parent.height
-        visible: false
         edge: Qt.LeftEdge
         modal: true
+
         background: Rectangle {
             color: "#172A45"  // Slightly lighter blue for sidebar
         }
@@ -79,6 +88,28 @@ Page {
                     verticalAlignment: Text.AlignVCenter
                 }
             }
+
+            Button {
+                text: "Log Out"
+                font.family: fontFamily
+                font.pixelSize: 18
+                Layout.fillWidth: true
+                onClicked: {
+                    logOut()
+                    sidebar.close()
+                }
+                background: Rectangle {
+                    color: "transparent"
+                    radius: 5
+                }
+                contentItem: Text {
+                    text: parent.text
+                    font: parent.font
+                    color: textColor
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+            }
         }
     }
 
@@ -123,31 +154,6 @@ Page {
                 }
 
                 Item { Layout.fillWidth: true }
-
-                // Font controls
-                Row {
-                    spacing: 5
-                    CustomButton { text: "-"; onClicked: decreaseFontSize() }
-                    TextField {
-                        id: fontSizeField
-                        width: 40
-                        text: "18"
-                        validator: IntValidator { bottom: 1; top: 100 }
-                        inputMethodHints: Qt.ImhDigitsOnly
-                        onTextChanged: setFontSizeFromField()
-                        horizontalAlignment: Text.AlignHCenter
-                        background: Rectangle {
-                            color: lightBackgroundColor
-                            radius: 4
-                        }
-                    }
-                    CustomButton { text: "+"; onClicked: increaseFontSize() }
-                }
-
-                CustomButton { text: "B"; font.bold: true; onClicked: toggleBold() }
-                CustomButton { text: "I"; font.italic: true; onClicked: toggleItalic() }
-                CustomButton { text: "U"; font.underline: true; onClicked: toggleUnderline() }
-                CustomButton { text: "Create List"; onClicked: createList() }
             }
         }
 
@@ -172,27 +178,92 @@ Page {
                         anchors.margins: 20
                         spacing: 20
 
-                        Label {
-                            text: "Previous Files"
-                            font.family: fontFamily
-                            font.pixelSize: 20
-                            color: accentColor
+                        RowLayout {
+                            Layout.fillWidth: true
+                            spacing: 10
+
+                            Label {
+                                text: showingDeletedFiles ? "Deleted Files" : "Saved Files"
+                                font.family: fontFamily
+                                font.pixelSize: 20
+                                color: accentColor
+                            }
+
+                            Button {
+                                text: "▼"
+                                onClicked: showingDeletedFiles = !showingDeletedFiles
+                                background: Rectangle {
+                                    color: "transparent"
+                                }
+                                contentItem: Text {
+                                    text: parent.text
+                                    font.family: fontFamily
+                                    font.pixelSize: 16
+                                    color: accentColor
+                                }
+                            }
                         }
 
                         ListView {
+                            id: filesList
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            model: ListModel { }
+                            model: showingDeletedFiles ? deletedFilesModel : savedFilesModel
                             delegate: ItemDelegate {
                                 width: parent.width
                                 height: 40
+
+                                background: Rectangle {
+                                    color: "transparent"
+                                    Rectangle {
+                                        anchors.bottom: parent.bottom
+                                        width: parent.width
+                                        height: 1
+                                        color: Qt.rgba(textColor.r, textColor.g, textColor.b, 0.1)
+                                    }
+                                }
+
                                 contentItem: Text {
-                                    text: ""
+                                    text: title
                                     font.family: fontFamily
                                     font.pixelSize: 16
                                     color: textColor
                                     verticalAlignment: Text.AlignVCenter
                                 }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    onEntered: parent.background.color = Qt.rgba(accentColor.r, accentColor.g, accentColor.b, 0.2)
+                                    onExited: parent.background.color = "transparent"
+                                    onClicked: {
+                                        if (!showingDeletedFiles) {
+                                            titleField.text = title
+                                            notesTextArea.text = content
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Button {
+                            visible: showingDeletedFiles
+                            text: "Empty Trash"
+                            onClicked: emptyTrash()
+                            Layout.fillWidth: true
+                            background: Rectangle {
+                                color: "transparent"
+                                border.color: accentColor
+                                border.width: 1
+                                radius: 5
+                            }
+                            contentItem: Text {
+                                text: parent.text
+                                font.family: fontFamily
+                                font.pixelSize: 16
+                                color: accentColor
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
                             }
                         }
                     }
@@ -235,18 +306,46 @@ Page {
                                 radius: 5
                             }
                             wrapMode: TextEdit.Wrap
+                        }
+                    }
 
-                            Keys.onPressed: {
-                                if (event.key === Qt.Key_B && event.modifiers & Qt.ControlModifier) {
-                                    toggleBold();
-                                    event.accepted = true;
-                                } else if (event.key === Qt.Key_I && event.modifiers & Qt.ControlModifier) {
-                                    toggleItalic();
-                                    event.accepted = true;
-                                } else if (event.key === Qt.Key_U && event.modifiers & Qt.ControlModifier) {
-                                    toggleUnderline();
-                                    event.accepted = true;
-                                }
+                    RowLayout {
+                        Layout.alignment: Qt.AlignRight
+                        spacing: 10
+
+                        Button {
+                            text: "Delete Note"
+                            onClicked: deleteNote()
+                            background: Rectangle {
+                                color: "transparent"
+                                border.color: accentColor
+                                border.width: 1
+                                radius: 5
+                            }
+                            contentItem: Text {
+                                text: parent.text
+                                font.family: fontFamily
+                                font.pixelSize: 16
+                                color: accentColor
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                        }
+
+                        Button {
+                            text: "Save Note"
+                            onClicked: saveNote()
+                            background: Rectangle {
+                                color: accentColor
+                                radius: 5
+                            }
+                            contentItem: Text {
+                                text: parent.text
+                                font.family: fontFamily
+                                font.pixelSize: 16
+                                color: "#172A45"
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
                             }
                         }
                     }
@@ -346,68 +445,127 @@ Page {
                             }
                         }
                     }
+
+                    Button {
+                        text: "Save To-Do List"
+                        Layout.alignment: Qt.AlignRight
+                        onClicked: saveTodoList()
+                        background: Rectangle {
+                            color: accentColor
+                            radius: 5
+                        }
+                        contentItem: Text {
+                            text: parent.text
+                            font.family: fontFamily
+                            font.pixelSize: 16
+                            color: "#172A45"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                    }
                 }
             }
         }
     }
 
-    // Custom button component
-    component CustomButton: Button {
-        contentItem: Text {
-            text: parent.text
-            font: parent.font
-            color: parent.pressed ? "#172A45" : accentColor
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-        }
-        background: Rectangle {
-            implicitWidth: 40
-            implicitHeight: 40
-            color: parent.pressed ? accentColor : "transparent"
-            border.color: accentColor
-            border.width: 1
-            radius: 4
+    function saveNote() {
+        if (titleField.text.trim() !== "") {
+            var success = dbManager.saveNote(currentUserId, titleField.text, notesTextArea.text);
+            console.log("Note save attempt. Success:", success, "Title:", titleField.text);
+            loadNotes();
+            titleField.text = "";
+            notesTextArea.text = "";
         }
     }
 
-    function increaseFontSize() {
-        var newSize = parseInt(fontSizeField.text) + 1;
-        fontSizeField.text = newSize.toString();
-        notesTextArea.font.pointSize = newSize;
-    }
-
-    function decreaseFontSize() {
-        var newSize = parseInt(fontSizeField.text) - 1;
-        if (newSize > 0) {
-            fontSizeField.text = newSize.toString();
-            notesTextArea.font.pointSize = newSize;
+    function deleteNote() {
+        if (titleField.text.trim() !== "") {
+            dbManager.deleteNote(currentUserId, titleField.text)
+            loadNotes()
+            titleField.text = ""
+            notesTextArea.text = ""
         }
     }
 
-    function setFontSizeFromField() {
-        var newSize = parseInt(fontSizeField.text);
-        if (newSize > 0) {
-            notesTextArea.font.pointSize = newSize;
+    function recoverNote(index) {
+        var noteTitle = deletedFilesModel.get(index).title
+        dbManager.recoverNote(currentUserId, noteTitle)
+        loadNotes()
+    }
+
+    function emptyTrash() {
+        dbManager.emptyTrash(currentUserId)
+        loadNotes()
+    }
+
+    function loadNotes() {
+        console.log("Loading notes for user:", currentUserId);
+        savedFilesModel.clear();
+        deletedFilesModel.clear();
+        var notes = dbManager.getAllNotes(currentUserId);
+        var deletedNotes = dbManager.getDeletedNotes(currentUserId);
+        console.log("Received notes:", JSON.stringify(notes));
+        console.log("Received deleted notes:", JSON.stringify(deletedNotes));
+        for (var i = 0; i < notes.length; i++) {
+            savedFilesModel.append(notes[i]);
+            console.log("Appended saved note:", JSON.stringify(notes[i]));
         }
+        for (var i = 0; i < deletedNotes.length; i++) {
+            deletedFilesModel.append(deletedNotes[i]);
+            console.log("Appended deleted note:", JSON.stringify(deletedNotes[i]));
+        }
+        console.log("Loaded", savedFilesModel.count, "saved notes and", deletedFilesModel.count, "deleted notes");
     }
 
-    function toggleBold() {
-        notesTextArea.font.bold = !notesTextArea.font.bold;
-    }
+    function saveTodoList() {
+        var todoItems = []
+        for (var i = 0; i < todoListModel.count; i++) {
+            todoItems.push({
+                task: todoListModel.get(i).task,
+                completed: todoListModel.get(i).completed
+            })
+        }
+        dbManager.saveTodoList(currentUserId, JSON.stringify(todoItems))
+            }
 
-    function toggleItalic() {
-        notesTextArea.font.italic = !notesTextArea.font.italic;
-    }
+            function loadTodoList() {
+                var todoListJson = dbManager.getTodoList(currentUserId)
+                if (todoListJson) {
+                    var todoItems = JSON.parse(todoListJson)
+                    todoListModel.clear()
+                    for (var i = 0; i < todoItems.length; i++) {
+                        todoListModel.append(todoItems[i])
+                    }
+                }
+            }
 
-    function toggleUnderline() {
-        notesTextArea.font.underline = !notesTextArea.font.underline;
-    }
+            function logOut() {
+                savedFilesModel.clear()
+                deletedFilesModel.clear()
+                todoListModel.clear()
+                titleField.text = ""
+                notesTextArea.text = ""
 
-    function createList() {
-        var text = notesTextArea.text;
-        var cursorPos = notesTextArea.cursorPosition;
-        text = text.substring(0, cursorPos) + '• ' + text.substring(cursorPos);
-        notesTextArea.text = text;
-        notesTextArea.cursorPosition += 2;
-    }
-}
+                isLoggedIn = false
+                currentUserId = -1
+
+                stackView.push("LoginPage.qml", { dbManager: dbManager })
+            }
+
+            function onLoginSuccessful(userId) {
+                currentUserId = userId
+                isLoggedIn = true
+                loadNotes()
+                loadTodoList()
+            }
+
+            Component.onCompleted: {
+                console.log("MainWindow completed. isLoggedIn:", isLoggedIn, "currentUserId:", currentUserId);
+                if (isLoggedIn && currentUserId !== -1) {
+                    loadNotes();
+                    loadTodoList();
+                } else {
+                    stackView.replace("LoginPage.qml", { dbManager: dbManager });
+                }
+            }
+        }

@@ -4,13 +4,16 @@ import QtQuick.Layouts 1.15
 import QtQuick.Dialogs
 import QtQuick.Controls.Material 2.15
 
-Item {
+Page {
     id: root
     property var dbManager
-    anchors.fill: parent
+    width: parent.width
+    height: parent.height
+
+    signal loginSuccessful(int userId)
 
     Material.theme: Material.Dark
-    Material.accent: Material.Teal  // Adjust this to match your accentColor
+    Material.accent: Material.Teal
 
     Component.onCompleted: {
         if (!root.dbManager) {
@@ -24,7 +27,6 @@ Item {
         anchors.fill: parent
         spacing: 0
 
-        // Left side with background image
         Image {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -33,7 +35,6 @@ Item {
             fillMode: Image.PreserveAspectCrop
         }
 
-        // Right side with login form
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -86,7 +87,7 @@ Item {
                     font.pixelSize: 16
                     Material.background: "transparent"
                     Material.foreground: Material.accentColor
-                    onClicked: stackView.push("SignUpPage.qml")
+                    onClicked: stackView.push("SignUpPage.qml", { dbManager: root.dbManager })
                 }
 
                 Button {
@@ -95,7 +96,7 @@ Item {
                     Layout.preferredHeight: 40
                     font.family: window.fontFamily
                     font.pixelSize: 14
-                    onClicked: stackView.pop()
+                    onClicked: stackView.pop("../../MainView.qml")
                     Material.background: "transparent"
                     Material.foreground: Material.foreground
                 }
@@ -107,17 +108,19 @@ Item {
         id: errorDialog
         title: "Login Failed"
         standardButtons: Dialog.Ok
+        width: 300
 
-        contentItem: Text {
+        Text {
+            width: parent.width
             text: "Invalid email or password. Please try again."
             color: "#FF0000"
             font.pixelSize: 14
+            wrapMode: Text.WordWrap
         }
 
         onAccepted: errorDialog.close()
     }
 
-    // Custom Components
     component CustomTextField: TextField {
         font.pixelSize: 14
         font.family: window.fontFamily
@@ -142,10 +145,15 @@ Item {
             return;
         }
 
-        var success = root.dbManager.loginUser(email, password);
-        if (success) {
+        var userId = root.dbManager.loginUser(email, password);
+        if (userId > 0) {
             console.log("User login successful");
-            stackView.push("MainWindow.qml");
+            loginSuccessful(userId);  // Emit the signal with the userId
+            stackView.push("MainWindow.qml", {
+                dbManager: root.dbManager,
+                currentUserId: userId,
+                isLoggedIn: true
+            });
         } else {
             console.log("User login failed");
             errorDialog.contentItem.text = "Invalid email or password. Please try again.";

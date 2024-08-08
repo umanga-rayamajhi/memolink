@@ -24,7 +24,7 @@ Page {
 
     Drawer {
         id: sidebar
-        width: 250
+        width: 200  // Reduced width
         height: parent.height
         edge: Qt.LeftEdge
         modal: true
@@ -35,71 +35,61 @@ Page {
 
         ColumnLayout {
             anchors.fill: parent
-            spacing: 20
-            anchors.margins: 20
+            spacing: 10  // Reduced spacing
+            anchors.margins: 10  // Reduced margins
 
             Label {
                 text: "Menu"
                 font.family: fontFamily
-                font.pixelSize: 24
+                font.pixelSize: 20  // Slightly smaller font
                 color: accentColor
+                Layout.alignment: Qt.AlignHCenter
+                Layout.bottomMargin: 10  // Add some space after the title
             }
 
-            Button {
-                text: "Notes"
-                font.family: fontFamily
-                font.pixelSize: 18
-                Layout.fillWidth: true
-                onClicked: {
-                    stackLayout.currentIndex = 0
-                    sidebar.close()
-                }
-                background: Rectangle {
-                    color: stackLayout.currentIndex === 0 ? accentColor : "transparent"
-                    radius: 5
-                }
-                contentItem: Text {
-                    text: parent.text
-                    font: parent.font
-                    color: stackLayout.currentIndex === 0 ? "#172A45" : textColor
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
+            Repeater {
+                model: ["Notes", "To-Do List"]
+                delegate: Button {
+                    text: modelData
+                    font.family: fontFamily
+                    font.pixelSize: 16  // Slightly smaller font
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 40  // Fixed height for consistency
+                    onClicked: {
+                        stackLayout.currentIndex = index
+                        sidebar.close()
+                    }
+                    background: Rectangle {
+                        color: stackLayout.currentIndex === index ? accentColor : "transparent"
+                        radius: 5
+                    }
+                    contentItem: Text {
+                        text: parent.text
+                        font: parent.font
+                        color: stackLayout.currentIndex === index ? "#172A45" : textColor
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
                 }
             }
 
-            Button {
-                text: "To-Do List"
-                font.family: fontFamily
-                font.pixelSize: 18
-                Layout.fillWidth: true
-                onClicked: {
-                    stackLayout.currentIndex = 1
-                    sidebar.close()
-                }
-                background: Rectangle {
-                    color: stackLayout.currentIndex === 1 ? accentColor : "transparent"
-                    radius: 5
-                }
-                contentItem: Text {
-                    text: parent.text
-                    font: parent.font
-                    color: stackLayout.currentIndex === 1 ? "#172A45" : textColor
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-            }
+            Item { Layout.fillHeight: true }  // Spacer
 
             Button {
                 text: "Log Out"
                 font.family: fontFamily
-                font.pixelSize: 18
+                font.pixelSize: 16  // Slightly smaller font
                 Layout.fillWidth: true
+                Layout.preferredHeight: 40  // Fixed height for consistency
+                Layout.bottomMargin: 10  // Add some space at the bottom
                 onClicked: {
                     logOut()
                     sidebar.close()
                 }
                 background: Rectangle {
                     color: "transparent"
+                    border.color: accentColor
+                    border.width: 1
                     radius: 5
                 }
                 contentItem: Text {

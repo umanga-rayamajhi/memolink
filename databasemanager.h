@@ -20,10 +20,11 @@ public:
     Q_INVOKABLE bool emptyTrash(int userId);
     Q_INVOKABLE bool saveTodoList(int userId, const QString &todoListJson);
     Q_INVOKABLE QString getTodoList(int userId);
+    Q_INVOKABLE bool permanentlyDeleteNote(int userId, const QString &title);
 
 private:
     QSqlDatabase m_db;
     bool initDatabase();
     bool openDatabase();
-    bool ensureNotesTableStructure();  // Add this line
+    bool ensureNotesTableStructure();
 };

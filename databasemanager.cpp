@@ -303,3 +303,23 @@ bool DatabaseManager::ensureNotesTableStructure()
     }
     return true;
 }
+
+bool DatabaseManager::permanentlyDeleteNote(int userId, const QString &title)
+{
+    if (!openDatabase()) {
+        qDebug() << "Database is not open";
+        return false;
+    }
+    QSqlQuery query(m_db);
+    query.prepare("DELETE FROM notes WHERE user_id = :userId AND title = :title AND is_deleted = 1");
+    query.bindValue(":userId", userId);
+    query.bindValue(":title", title);
+    qDebug() << "Query prepared:" << query.lastQuery();
+    qDebug() << "Bound values:" << query.boundValues();
+    if (!query.exec()) {
+        qDebug() << "Error permanently deleting note:" << query.lastError().text();
+        return false;
+    }
+    qDebug() << "Note permanently deleted for user" << userId << "with title:" << title;
+    return true;
+}

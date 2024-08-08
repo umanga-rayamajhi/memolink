@@ -237,10 +237,8 @@ Page {
                                     onEntered: parent.background.color = Qt.rgba(accentColor.r, accentColor.g, accentColor.b, 0.2)
                                     onExited: parent.background.color = "transparent"
                                     onClicked: {
-                                        if (!showingDeletedFiles) {
-                                            titleField.text = title
-                                            notesTextArea.text = content
-                                        }
+                                        titleField.text = title
+                                        notesTextArea.text = content
                                     }
                                 }
                             }
@@ -314,8 +312,27 @@ Page {
                         spacing: 10
 
                         Button {
-                            text: "Delete Note"
-                            onClicked: deleteNote()
+                            text: "New Note"
+                            onClicked: newNote()
+                            background: Rectangle {
+                                color: "transparent"
+                                border.color: accentColor
+                                border.width: 1
+                                radius: 5
+                            }
+                            contentItem: Text {
+                                text: parent.text
+                                font.family: fontFamily
+                                font.pixelSize: 16
+                                color: accentColor
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                        }
+
+                        Button {
+                            text: showingDeletedFiles ? "Recover Note" : "Delete Note"
+                            onClicked: showingDeletedFiles ? recoverNote() : deleteNote()
                             background: Rectangle {
                                 color: "transparent"
                                 border.color: accentColor
@@ -468,6 +485,11 @@ Page {
         }
     }
 
+    function newNote() {
+        titleField.text = ""
+        notesTextArea.text = ""
+    }
+
     function saveNote() {
         if (titleField.text.trim() !== "") {
             var success = dbManager.saveNote(currentUserId, titleField.text, notesTextArea.text);
@@ -480,92 +502,99 @@ Page {
 
     function deleteNote() {
         if (titleField.text.trim() !== "") {
-            dbManager.deleteNote(currentUserId, titleField.text)
+            if (showingDeletedFiles) {
+                dbManager.permanentlyDeleteNote(currentUserId, titleField.text)
+            } else {
+                dbManager.deleteNote(currentUserId, titleField.text)
+            }
             loadNotes()
             titleField.text = ""
             notesTextArea.text = ""
         }
     }
 
-    function recoverNote(index) {
-        var noteTitle = deletedFilesModel.get(index).title
-        dbManager.recoverNote(currentUserId, noteTitle)
-        loadNotes()
-    }
-
-    function emptyTrash() {
-        dbManager.emptyTrash(currentUserId)
-        loadNotes()
-    }
-
-    function loadNotes() {
-        console.log("Loading notes for user:", currentUserId);
-        savedFilesModel.clear();
-        deletedFilesModel.clear();
-        var notes = dbManager.getAllNotes(currentUserId);
-        var deletedNotes = dbManager.getDeletedNotes(currentUserId);
-        console.log("Received notes:", JSON.stringify(notes));
-        console.log("Received deleted notes:", JSON.stringify(deletedNotes));
-        for (var i = 0; i < notes.length; i++) {
-            savedFilesModel.append(notes[i]);
-            console.log("Appended saved note:", JSON.stringify(notes[i]));
-        }
-        for (var i = 0; i < deletedNotes.length; i++) {
-            deletedFilesModel.append(deletedNotes[i]);
-            console.log("Appended deleted note:", JSON.stringify(deletedNotes[i]));
-        }
-        console.log("Loaded", savedFilesModel.count, "saved notes and", deletedFilesModel.count, "deleted notes");
-    }
-
-    function saveTodoList() {
-        var todoItems = []
-        for (var i = 0; i < todoListModel.count; i++) {
-            todoItems.push({
-                task: todoListModel.get(i).task,
-                completed: todoListModel.get(i).completed
-            })
-        }
-        dbManager.saveTodoList(currentUserId, JSON.stringify(todoItems))
-            }
-
-            function loadTodoList() {
-                var todoListJson = dbManager.getTodoList(currentUserId)
-                if (todoListJson) {
-                    var todoItems = JSON.parse(todoListJson)
-                    todoListModel.clear()
-                    for (var i = 0; i < todoItems.length; i++) {
-                        todoListModel.append(todoItems[i])
-                    }
-                }
-            }
-
-            function logOut() {
-                savedFilesModel.clear()
-                deletedFilesModel.clear()
-                todoListModel.clear()
+    function recoverNote() {
+            if (titleField.text.trim() !== "") {
+                dbManager.recoverNote(currentUserId, titleField.text)
+                loadNotes()
                 titleField.text = ""
                 notesTextArea.text = ""
-
-                isLoggedIn = false
-                currentUserId = -1
-
-                stackView.push("LoginPage.qml", { dbManager: dbManager })
             }
+        }
 
-            function onLoginSuccessful(userId) {
-                currentUserId = userId
-                isLoggedIn = true
-                loadNotes()
-                loadTodoList()
+        function emptyTrash() {
+            dbManager.emptyTrash(currentUserId)
+            loadNotes()
+        }
+
+        function loadNotes() {
+            console.log("Loading notes for user:", currentUserId);
+            savedFilesModel.clear();
+            deletedFilesModel.clear();
+            var notes = dbManager.getAllNotes(currentUserId);
+            var deletedNotes = dbManager.getDeletedNotes(currentUserId);
+            console.log("Received notes:", JSON.stringify(notes));
+            console.log("Received deleted notes:", JSON.stringify(deletedNotes));
+            for (var i = 0; i < notes.length; i++) {
+                savedFilesModel.append(notes[i]);
+                console.log("Appended saved note:", JSON.stringify(notes[i]));
             }
+            for (var i = 0; i < deletedNotes.length; i++) {
+                deletedFilesModel.append(deletedNotes[i]);
+                console.log("Appended deleted note:", JSON.stringify(deletedNotes[i]));
+            }
+            console.log("Loaded", savedFilesModel.count, "saved notes and", deletedFilesModel.count, "deleted notes");
+        }
 
-            Component.onCompleted: {
-                console.log("MainWindow completed. isLoggedIn:", isLoggedIn, "currentUserId:", currentUserId);
-                if (isLoggedIn && currentUserId !== -1) {
-                    loadNotes();
-                    loadTodoList();
-                } else {
-                    stackView.replace("LoginPage.qml", { dbManager: dbManager });
+        function saveTodoList() {
+            var todoItems = []
+            for (var i = 0; i < todoListModel.count; i++) {
+                todoItems.push({
+                    task: todoListModel.get(i).task,
+                    completed: todoListModel.get(i).completed
+                })
+            }
+            dbManager.saveTodoList(currentUserId, JSON.stringify(todoItems))
+        }
+
+        function loadTodoList() {
+            var todoListJson = dbManager.getTodoList(currentUserId)
+            if (todoListJson) {
+                var todoItems = JSON.parse(todoListJson)
+                todoListModel.clear()
+                for (var i = 0; i < todoItems.length; i++) {
+                    todoListModel.append(todoItems[i])
                 }
             }
         }
+
+        function logOut() {
+            savedFilesModel.clear()
+            deletedFilesModel.clear()
+            todoListModel.clear()
+            titleField.text = ""
+            notesTextArea.text = ""
+
+            isLoggedIn = false
+            currentUserId = -1
+
+            stackView.push("LoginPage.qml", { dbManager: dbManager })
+        }
+
+        function onLoginSuccessful(userId) {
+            currentUserId = userId
+            isLoggedIn = true
+            loadNotes()
+            loadTodoList()
+        }
+
+        Component.onCompleted: {
+            console.log("MainWindow completed. isLoggedIn:", isLoggedIn, "currentUserId:", currentUserId);
+            if (isLoggedIn && currentUserId !== -1) {
+                loadNotes();
+                loadTodoList();
+            } else {
+                stackView.replace("LoginPage.qml", { dbManager: dbManager });
+            }
+        }
+    }

@@ -14,6 +14,8 @@ Page {
     property var dbManager
     property int currentUserId: -1
     property bool showingDeletedFiles: false
+    property bool editingExistingNote: false
+    property string originalTitle: ""
 
     background: Rectangle {
         color: "#0A192F"  // Dark blue background
@@ -229,6 +231,8 @@ Page {
                                     onClicked: {
                                         titleField.text = title
                                         notesTextArea.text = content
+                                        editingExistingNote = true
+                                        originalTitle = title
                                     }
                                 }
                             }
@@ -302,8 +306,8 @@ Page {
                         spacing: 10
 
                         Button {
-                            text: "New Note"
-                            onClicked: newNote()
+                            text: showingDeletedFiles ? "Delete Permanently" : "New Note"
+                            onClicked: showingDeletedFiles ? permanentlyDeleteNote() : newNote()
                             background: Rectangle {
                                 color: "transparent"
                                 border.color: accentColor
@@ -340,6 +344,7 @@ Page {
                         }
 
                         Button {
+                            visible: !showingDeletedFiles
                             text: "Save Note"
                             onClicked: saveNote()
                             background: Rectangle {
@@ -375,11 +380,11 @@ Page {
                         color: accentColor
                     }
 
-                    Row {
+                    RowLayout {
                         spacing: 10
                         TextField {
                             id: todoInput
-                            width: 300
+                            Layout.preferredWidth: 250
                             placeholderText: "Add a new task"
                             font.family: fontFamily
                             font.pixelSize: 16
@@ -389,12 +394,40 @@ Page {
                                 radius: 5
                             }
                         }
+
+                        ComboBox {
+                            id: priorityCombo
+                            Layout.preferredWidth: 100
+                            model: ["Low", "Medium", "High"]
+                            font.family: fontFamily
+                            font.pixelSize: 16
+                        }
+
+                        TextField {
+                            id: deadlineInput
+                            Layout.preferredWidth: 120
+                            placeholderText: "YYYY-MM-DD"
+                            font.family: fontFamily
+                            font.pixelSize: 16
+                            color: "#2c3e50"
+                            background: Rectangle {
+                                color: lightBackgroundColor
+                                radius: 5
+                            }
+                        }
+
                         Button {
                             text: "Add"
                             onClicked: {
                                 if (todoInput.text.trim() !== "") {
-                                    todoListModel.append({task: todoInput.text, completed: false})
+                                    todoListModel.append({
+                                        task: todoInput.text,
+                                        completed: false,
+                                        priority: priorityCombo.currentText,
+                                        deadline: deadlineInput.text
+                                    })
                                     todoInput.text = ""
+                                    deadlineInput.text = ""
                                 }
                             }
                             background: Rectangle {
@@ -432,6 +465,25 @@ Page {
                                 font.strikeout: completed
                                 Layout.fillWidth: true
                             }
+                            Text {
+                                text: priority
+                                font.family: fontFamily
+                                font.pixelSize: 14
+                                color: {
+                                    switch(priority) {
+                                        case "Low": return "green"
+                                        case "Medium": return "orange"
+                                        case "High": return "red"
+                                        default: return textColor
+                                    }
+                                }
+                            }
+                            Text {
+                                text: deadline
+                                font.family: fontFamily
+                                font.pixelSize: 14
+                                color: textColor
+                            }
                             Button {
                                 text: "Delete"
                                 onClicked: todoListModel.remove(index)
@@ -463,128 +515,153 @@ Page {
                         }
                         contentItem: Text {
                             text: parent.text
-                            font.family: fontFamily
-                            font.pixelSize: 16
-                            color: "#172A45"
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                    }
-                }
-            }
-        }
-    }
+                                                        font.family: fontFamily
+                                                        font.pixelSize: 16
+                                                        color: "#172A45"
+                                                        horizontalAlignment: Text.AlignHCenter
+                                                        verticalAlignment: Text.AlignVCenter
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
 
-    function newNote() {
-        titleField.text = ""
-        notesTextArea.text = ""
-    }
+                                function newNote() {
+                                    titleField.text = ""
+                                    notesTextArea.text = ""
+                                    editingExistingNote = false
+                                    originalTitle = ""
+                                }
 
-    function saveNote() {
-        if (titleField.text.trim() !== "") {
-            var success = dbManager.saveNote(currentUserId, titleField.text, notesTextArea.text);
-            console.log("Note save attempt. Success:", success, "Title:", titleField.text);
-            loadNotes();
-            titleField.text = "";
-            notesTextArea.text = "";
-        }
-    }
+                                function saveNote() {
+                                    if (titleField.text.trim() !== "") {
+                                        var success;
+                                        if (editingExistingNote) {
+                                            success = dbManager.updateNote(currentUserId, originalTitle, titleField.text, notesTextArea.text);
+                                            console.log("Note update attempt. Success:", success, "Title:", titleField.text);
+                                        } else {
+                                            success = dbManager.saveNote(currentUserId, titleField.text, notesTextArea.text);
+                                            console.log("New note save attempt. Success:", success, "Title:", titleField.text);
+                                        }
+                                        loadNotes();
+                                        titleField.text = "";
+                                        notesTextArea.text = "";
+                                        editingExistingNote = false;
+                                        originalTitle = "";
+                                    }
+                                }
 
-    function deleteNote() {
-        if (titleField.text.trim() !== "") {
-            if (showingDeletedFiles) {
-                dbManager.permanentlyDeleteNote(currentUserId, titleField.text)
-            } else {
-                dbManager.deleteNote(currentUserId, titleField.text)
-            }
-            loadNotes()
-            titleField.text = ""
-            notesTextArea.text = ""
-        }
-    }
+                                function deleteNote() {
+                                    if (titleField.text.trim() !== "") {
+                                        dbManager.deleteNote(currentUserId, titleField.text)
+                                        loadNotes()
+                                        titleField.text = ""
+                                        notesTextArea.text = ""
+                                        editingExistingNote = false
+                                        originalTitle = ""
+                                    }
+                                }
 
-    function recoverNote() {
-            if (titleField.text.trim() !== "") {
-                dbManager.recoverNote(currentUserId, titleField.text)
-                loadNotes()
-                titleField.text = ""
-                notesTextArea.text = ""
-            }
-        }
+                                function recoverNote() {
+                                    if (titleField.text.trim() !== "") {
+                                        dbManager.recoverNote(currentUserId, titleField.text)
+                                        loadNotes()
+                                        titleField.text = ""
+                                        notesTextArea.text = ""
+                                        editingExistingNote = false
+                                        originalTitle = ""
+                                    }
+                                }
 
-        function emptyTrash() {
-            dbManager.emptyTrash(currentUserId)
-            loadNotes()
-        }
+                                function permanentlyDeleteNote() {
+                                    if (titleField.text.trim() !== "") {
+                                        dbManager.permanentlyDeleteNote(currentUserId, titleField.text)
+                                        loadNotes()
+                                        titleField.text = ""
+                                        notesTextArea.text = ""
+                                        editingExistingNote = false
+                                        originalTitle = ""
+                                    }
+                                }
 
-        function loadNotes() {
-            console.log("Loading notes for user:", currentUserId);
-            savedFilesModel.clear();
-            deletedFilesModel.clear();
-            var notes = dbManager.getAllNotes(currentUserId);
-            var deletedNotes = dbManager.getDeletedNotes(currentUserId);
-            console.log("Received notes:", JSON.stringify(notes));
-            console.log("Received deleted notes:", JSON.stringify(deletedNotes));
-            for (var i = 0; i < notes.length; i++) {
-                savedFilesModel.append(notes[i]);
-                console.log("Appended saved note:", JSON.stringify(notes[i]));
-            }
-            for (var i = 0; i < deletedNotes.length; i++) {
-                deletedFilesModel.append(deletedNotes[i]);
-                console.log("Appended deleted note:", JSON.stringify(deletedNotes[i]));
-            }
-            console.log("Loaded", savedFilesModel.count, "saved notes and", deletedFilesModel.count, "deleted notes");
-        }
+                                function emptyTrash() {
+                                    dbManager.emptyTrash(currentUserId)
+                                    loadNotes()
+                                }
 
-        function saveTodoList() {
-            var todoItems = []
-            for (var i = 0; i < todoListModel.count; i++) {
-                todoItems.push({
-                    task: todoListModel.get(i).task,
-                    completed: todoListModel.get(i).completed
-                })
-            }
-            dbManager.saveTodoList(currentUserId, JSON.stringify(todoItems))
-        }
+                                function loadNotes() {
+                                    console.log("Loading notes for user:", currentUserId);
+                                    savedFilesModel.clear();
+                                    deletedFilesModel.clear();
+                                    var notes = dbManager.getAllNotes(currentUserId);
+                                    var deletedNotes = dbManager.getDeletedNotes(currentUserId);
+                                    console.log("Received notes:", JSON.stringify(notes));
+                                    console.log("Received deleted notes:", JSON.stringify(deletedNotes));
+                                    for (var i = 0; i < notes.length; i++) {
+                                        savedFilesModel.append(notes[i]);
+                                        console.log("Appended saved note:", JSON.stringify(notes[i]));
+                                    }
+                                    for (var i = 0; i < deletedNotes.length; i++) {
+                                        deletedFilesModel.append(deletedNotes[i]);
+                                        console.log("Appended deleted note:", JSON.stringify(deletedNotes[i]));
+                                    }
+                                    console.log("Loaded", savedFilesModel.count, "saved notes and", deletedFilesModel.count, "deleted notes");
+                                }
 
-        function loadTodoList() {
-            var todoListJson = dbManager.getTodoList(currentUserId)
-            if (todoListJson) {
-                var todoItems = JSON.parse(todoListJson)
-                todoListModel.clear()
-                for (var i = 0; i < todoItems.length; i++) {
-                    todoListModel.append(todoItems[i])
-                }
-            }
-        }
+                                function saveTodoList() {
+                                    var todoItems = []
+                                    for (var i = 0; i < todoListModel.count; i++) {
+                                        todoItems.push({
+                                            task: todoListModel.get(i).task,
+                                            completed: todoListModel.get(i).completed,
+                                            priority: todoListModel.get(i).priority,
+                                            deadline: todoListModel.get(i).deadline
+                                        })
+                                    }
+                                    dbManager.saveTodoList(currentUserId, JSON.stringify(todoItems))
+                                }
 
-        function logOut() {
-            savedFilesModel.clear()
-            deletedFilesModel.clear()
-            todoListModel.clear()
-            titleField.text = ""
-            notesTextArea.text = ""
+                                function loadTodoList() {
+                                    var todoListJson = dbManager.getTodoList(currentUserId)
+                                    if (todoListJson) {
+                                        var todoItems = JSON.parse(todoListJson)
+                                        todoListModel.clear()
+                                        for (var i = 0; i < todoItems.length; i++) {
+                                            todoListModel.append(todoItems[i])
+                                        }
+                                    }
+                                }
 
-            isLoggedIn = false
-            currentUserId = -1
+                                function logOut() {
+                                    savedFilesModel.clear()
+                                    deletedFilesModel.clear()
+                                    todoListModel.clear()
+                                    titleField.text = ""
+                                    notesTextArea.text = ""
+                                    editingExistingNote = false
+                                    originalTitle = ""
 
-            stackView.push("LoginPage.qml", { dbManager: dbManager })
-        }
+                                    isLoggedIn = false
+                                    currentUserId = -1
 
-        function onLoginSuccessful(userId) {
-            currentUserId = userId
-            isLoggedIn = true
-            loadNotes()
-            loadTodoList()
-        }
+                                    stackView.push("LoginPage.qml", { dbManager: dbManager })
+                                }
 
-        Component.onCompleted: {
-            console.log("MainWindow completed. isLoggedIn:", isLoggedIn, "currentUserId:", currentUserId);
-            if (isLoggedIn && currentUserId !== -1) {
-                loadNotes();
-                loadTodoList();
-            } else {
-                stackView.replace("LoginPage.qml", { dbManager: dbManager });
-            }
-        }
-    }
+                                function onLoginSuccessful(userId) {
+                                    currentUserId = userId
+                                    isLoggedIn = true
+                                    loadNotes()
+                                    loadTodoList()
+                                }
+
+                                Component.onCompleted: {
+                                    console.log("MainWindow completed. isLoggedIn:", isLoggedIn, "currentUserId:", currentUserId);
+                                    if (isLoggedIn && currentUserId !== -1) {
+                                        loadNotes();
+                                        loadTodoList();
+                                    } else {
+                                        stackView.replace("LoginPage.qml", { dbManager: dbManager });
+                                    }
+                                }
+                            }

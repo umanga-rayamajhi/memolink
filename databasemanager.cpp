@@ -4,6 +4,9 @@
 #include <QDebug>
 #include <QDir>
 #include <QStandardPaths>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
 
 DatabaseManager::DatabaseManager(QObject *parent) : QObject(parent)
 {
@@ -43,7 +46,14 @@ bool DatabaseManager::initDatabase()
         qDebug() << "Error creating notes table:" << query.lastError().text();
         return false;
     }
-    if (!query.exec("CREATE TABLE IF NOT EXISTS todolist (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, content TEXT, FOREIGN KEY(user_id) REFERENCES users(id))")) {
+    if (!query.exec("CREATE TABLE IF NOT EXISTS todolist ("
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    "user_id INTEGER, "
+                    "task TEXT, "
+                    "completed BOOLEAN, "
+                    "priority TEXT, "
+                    "deadline TEXT, "
+                    "FOREIGN KEY(user_id) REFERENCES users(id))")) {
         qDebug() << "Error creating todolist table:" << query.lastError().text();
         return false;
     }
@@ -122,6 +132,28 @@ bool DatabaseManager::saveNote(int userId, const QString &title, const QString &
         return false;
     }
     qDebug() << "Note saved successfully for user" << userId << "with title:" << title;
+    return true;
+}
+
+bool DatabaseManager::updateNote(int userId, const QString &oldTitle, const QString &newTitle, const QString &content)
+{
+    if (!openDatabase()) {
+        qDebug() << "Database is not open";
+        return false;
+    }
+    QSqlQuery query(m_db);
+    query.prepare("UPDATE notes SET title = :newTitle, content = :content WHERE user_id = :userId AND title = :oldTitle AND is_deleted = 0");
+    query.bindValue(":userId", userId);
+    query.bindValue(":oldTitle", oldTitle);
+    query.bindValue(":newTitle", newTitle);
+    query.bindValue(":content", content);
+    qDebug() << "Query prepared:" << query.lastQuery();
+    qDebug() << "Bound values:" << query.boundValues();
+    if (!query.exec()) {
+        qDebug() << "Error updating note:" << query.lastError().text();
+        return false;
+    }
+    qDebug() << "Note updated successfully for user" << userId << "with new title:" << newTitle;
     return true;
 }
 
@@ -244,16 +276,38 @@ bool DatabaseManager::saveTodoList(int userId, const QString &todoListJson)
         qDebug() << "Database is not open";
         return false;
     }
-    QSqlQuery query(m_db);
-    query.prepare("INSERT OR REPLACE INTO todolist (user_id, content) VALUES (:userId, :content)");
-    query.bindValue(":userId", userId);
-    query.bindValue(":content", todoListJson);
-    qDebug() << "Query prepared:" << query.lastQuery();
-    qDebug() << "Bound values:" << query.boundValues();
-    if (!query.exec()) {
-        qDebug() << "Error saving todo list:" << query.lastError().text();
+
+    // First, delete existing todo items for this user
+    QSqlQuery deleteQuery(m_db);
+    deleteQuery.prepare("DELETE FROM todolist WHERE user_id = :userId");
+    deleteQuery.bindValue(":userId", userId);
+    if (!deleteQuery.exec()) {
+        qDebug() << "Error deleting old todo items:" << deleteQuery.lastError().text();
         return false;
     }
+
+    // Parse the JSON and insert new items
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(todoListJson.toUtf8());
+    QJsonArray todoArray = jsonDoc.array();
+
+    QSqlQuery insertQuery(m_db);
+    insertQuery.prepare("INSERT INTO todolist (user_id, task, completed, priority, deadline) "
+                        "VALUES (:userId, :task, :completed, :priority, :deadline)");
+
+    for (const QJsonValue &value : todoArray) {
+        QJsonObject item = value.toObject();
+        insertQuery.bindValue(":userId", userId);
+        insertQuery.bindValue(":task", item["task"].toString());
+        insertQuery.bindValue(":completed", item["completed"].toBool());
+        insertQuery.bindValue(":priority", item["priority"].toString());
+        insertQuery.bindValue(":deadline", item["deadline"].toString());
+
+        if (!insertQuery.exec()) {
+            qDebug() << "Error inserting todo item:" << insertQuery.lastError().text();
+            return false;
+        }
+    }
+
     qDebug() << "Todo list saved for user" << userId;
     return true;
 }
@@ -264,19 +318,28 @@ QString DatabaseManager::getTodoList(int userId)
         qDebug() << "Database is not open";
         return QString();
     }
+
     QSqlQuery query(m_db);
-    query.prepare("SELECT content FROM todolist WHERE user_id = :userId");
+    query.prepare("SELECT task, completed, priority, deadline FROM todolist WHERE user_id = :userId");
     query.bindValue(":userId", userId);
-    qDebug() << "Query prepared:" << query.lastQuery();
-    qDebug() << "Bound values:" << query.boundValues();
+
     if (!query.exec()) {
-        qDebug() << "Error fetching todo list:" << query.lastError().text();
+        qDebug() << "Error fetching todo items:" << query.lastError().text();
         return QString();
     }
-    if (query.next()) {
-        return query.value(0).toString();
+
+    QJsonArray todoArray;
+    while (query.next()) {
+        QJsonObject item;
+        item["task"] = query.value("task").toString();
+        item["completed"] = query.value("completed").toBool();
+        item["priority"] = query.value("priority").toString();
+        item["deadline"] = query.value("deadline").toString();
+        todoArray.append(item);
     }
-    return QString();
+
+    QJsonDocument jsonDoc(todoArray);
+    return QString(jsonDoc.toJson());
 }
 
 bool DatabaseManager::ensureNotesTableStructure()

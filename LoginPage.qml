@@ -89,17 +89,6 @@ Page {
                     Material.foreground: Material.accentColor
                     onClicked: stackView.push("SignUpPage.qml", { dbManager: root.dbManager })
                 }
-
-                Button {
-                    text: "Back to Main Menu"
-                    Layout.preferredWidth: parent.width * 0.6
-                    Layout.preferredHeight: 40
-                    font.family: window.fontFamily
-                    font.pixelSize: 14
-                    onClicked: stackView.pop("../../MainView.qml")
-                    Material.background: "transparent"
-                    Material.foreground: Material.foreground
-                }
             }
         }
     }

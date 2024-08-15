@@ -15,14 +15,6 @@ Page {
     Material.theme: Material.Dark
     Material.accent: Material.Teal
 
-    Component.onCompleted: {
-        if (!root.dbManager) {
-            console.error("dbManager is not available in LoginPage")
-        } else {
-            console.log("dbManager is available in LoginPage")
-        }
-    }
-
     RowLayout {
         anchors.fill: parent
         spacing: 0
@@ -123,13 +115,6 @@ Page {
 
         if (email.trim() === "" || password.trim() === "") {
             errorDialog.contentItem.text = "Please fill in all required fields.";
-            errorDialog.open();
-            return;
-        }
-
-        if (!root.dbManager) {
-            console.error("dbManager is not available");
-            errorDialog.contentItem.text = "An error occurred. Please try again later.";
             errorDialog.open();
             return;
         }

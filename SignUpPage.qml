@@ -12,21 +12,12 @@ Item {
     signal registrationSuccessful(int userId)
 
     Material.theme: Material.Dark
-    Material.accent: Material.Teal  // Adjust this to match your accentColor
-
-    Component.onCompleted: {
-        if (!root.dbManager) {
-            console.error("dbManager is not available in SignUpPage")
-        } else {
-            console.log("dbManager is available in SignUpPage")
-        }
-    }
+    Material.accent: Material.Teal
 
     RowLayout {
         anchors.fill: parent
         spacing: 0
 
-        // Left side with background image
         Image {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -35,7 +26,6 @@ Item {
             fillMode: Image.PreserveAspectCrop
         }
 
-        // Right side with signup form
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -103,17 +93,6 @@ Item {
                     Material.foreground: Material.accentColor
                     onClicked: stackView.push("LoginPage.qml", { dbManager: root.dbManager })
                 }
-
-                // Button {
-                //     text: "Back to Main Menu"
-                //     Layout.preferredWidth: parent.width * 0.6
-                //     Layout.preferredHeight: 40
-                //     font.family: window.fontFamily
-                //     font.pixelSize: 14
-                //     onClicked: stackView.pop("../../MainView.qml")
-                //     Material.background: "transparent"
-                //     Material.foreground: Material.foreground
-                // }
             }
         }
     }
@@ -149,7 +128,6 @@ Item {
         }
     }
 
-    // Custom Components
     component CustomTextField: TextField {
         font.pixelSize: 14
         font.family: window.fontFamily
@@ -171,13 +149,6 @@ Item {
 
         if (password !== confirmPassword) {
             errorText.text = "Passwords do not match.";
-            errorDialog.open();
-            return;
-        }
-
-        if (!root.dbManager) {
-            console.error("dbManager is not available");
-            errorText.text = "An error occurred. Please try again later.";
             errorDialog.open();
             return;
         }

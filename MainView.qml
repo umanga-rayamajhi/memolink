@@ -8,7 +8,6 @@ ApplicationWindow {
     visible: true
     width: 1024
     height: 768
-    title: qsTr("MemoLink")
 
     property string fontFamily: "Roboto"
     Material.theme: Material.Dark
@@ -16,14 +15,6 @@ ApplicationWindow {
     Material.primary: "#0A192F"
     Material.background: "#0A192F"
     Material.foreground: "#CCD6F6"
-
-    Component.onCompleted: {
-        if (dbManager) {
-            console.log("dbManager is available in MainView")
-        } else {
-            console.error("dbManager is not available in MainView")
-        }
-    }
 
     StackView {
         id: stackView

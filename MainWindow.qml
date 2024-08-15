@@ -515,445 +515,444 @@ Page {
                                     Button {
                                         text: "Delete"
                                         onClicked: todoListModel.remove(index)
-                                                                                background: Rectangle {
-                                                                                    color: "transparent"
-                                                                                    border.color: accentColor
-                                                                                    border.width: 1
-                                                                                    radius: 5
-                                                                                }
-                                                                                contentItem: Text {
-                                                                                    text: parent.text
-                                                                                    font.family: fontFamily
-                                                                                    font.pixelSize: 14
-                                                                                    color: accentColor
-                                                                                    horizontalAlignment: Text.AlignHCenter
-                                                                                    verticalAlignment: Text.AlignVCenter
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-
-                                                            Button {
-                                                                text: "Save To-Do List"
-                                                                Layout.alignment: Qt.AlignRight
-                                                                onClicked: saveTodoList()
-                                                                background: Rectangle {
-                                                                    color: accentColor
-                                                                    radius: 5
-                                                                }
-                                                                contentItem: Text {
-                                                                    text: parent.text
-                                                                    font.family: fontFamily
-                                                                    font.pixelSize: 16
-                                                                    color: "#172A45"
-                                                                    horizontalAlignment: Text.AlignHCenter
-                                                                    verticalAlignment: Text.AlignVCenter
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-
-                                                    // About Me Page
-                                                    Rectangle {
-                                                        color: "#172A45"
-
-                                                        RowLayout {
-                                                            anchors.fill: parent
-                                                            spacing: 20
-
-                                                            // Left side: User Info and Account Statistics
-                                                            ColumnLayout {
-                                                                Layout.fillHeight: true
-                                                                Layout.preferredWidth: parent.width / 2
-                                                                Layout.margins: 20
-                                                                spacing: 20
-
-                                                                Label {
-                                                                    text: "About Me"
-                                                                    font.family: fontFamily
-                                                                    font.pixelSize: 24
-                                                                    color: accentColor
-                                                                }
-
-                                                                // User Info Section
-                                                                ColumnLayout {
-                                                                    Layout.fillWidth: true
-                                                                    spacing: 10
-
-                                                                    Label {
-                                                                        text: "User Information"
-                                                                        font.family: fontFamily
-                                                                        font.pixelSize: 18
-                                                                        color: textColor
-                                                                    }
-
-                                                                    Text {
-                                                                        text: "Username: " + dbManager.getUsername(currentUserId)
-                                                                        font.family: fontFamily
-                                                                        font.pixelSize: 16
-                                                                        color: textColor
-                                                                    }
-
-                                                                    Text {
-                                                                        text: "Email: " + dbManager.getUserEmail(currentUserId)
-                                                                        font.family: fontFamily
-                                                                        font.pixelSize: 16
-                                                                        color: textColor
-                                                                    }
-                                                                }
-
-                                                                // Account Statistics Section
-                                                                ColumnLayout {
-                                                                    Layout.fillWidth: true
-                                                                    spacing: 10
-
-                                                                    Label {
-                                                                        text: "Account Statistics"
-                                                                        font.family: fontFamily
-                                                                        font.pixelSize: 18
-                                                                        color: textColor
-                                                                    }
-
-                                                                    Text {
-                                                                        text: "Total Notes: " + dbManager.getTotalNotes(currentUserId)
-                                                                        font.family: fontFamily
-                                                                        font.pixelSize: 16
-                                                                        color: textColor
-                                                                    }
-
-                                                                    Text {
-                                                                        text: "Completed Tasks: " + dbManager.getCompletedTasks(currentUserId)
-                                                                        font.family: fontFamily
-                                                                        font.pixelSize: 16
-                                                                        color: textColor
-                                                                    }
-                                                                }
-                                                            }
-
-                                                            // Right side: Change Password and Delete Account
-                                                            ColumnLayout {
-                                                                Layout.fillHeight: true
-                                                                Layout.preferredWidth: parent.width / 2
-                                                                Layout.margins: 20
-                                                                spacing: 20
-
-                                                                // Change Password Section
-                                                                ColumnLayout {
-                                                                    Layout.fillWidth: true
-                                                                    spacing: 10
-
-                                                                    Label {
-                                                                        text: "Change Password"
-                                                                        font.family: fontFamily
-                                                                        font.pixelSize: 18
-                                                                        color: textColor
-                                                                    }
-
-                                                                    TextField {
-                                                                        id: currentPasswordField
-                                                                        Layout.fillWidth: true
-                                                                        placeholderText: "Current Password"
-                                                                        echoMode: TextInput.Password
-                                                                        font.family: fontFamily
-                                                                        font.pixelSize: 16
-                                                                        color: "#2c3e50"
-                                                                        background: Rectangle {
-                                                                            color: lightBackgroundColor
-                                                                            radius: 5
-                                                                        }
-                                                                    }
-
-                                                                    TextField {
-                                                                        id: newPasswordField
-                                                                        Layout.fillWidth: true
-                                                                        placeholderText: "New Password"
-                                                                        echoMode: TextInput.Password
-                                                                        font.family: fontFamily
-                                                                        font.pixelSize: 16
-                                                                        color: "#2c3e50"
-                                                                        background: Rectangle {
-                                                                            color: lightBackgroundColor
-                                                                            radius: 5
-                                                                        }
-                                                                    }
-
-                                                                    TextField {
-                                                                        id: confirmNewPasswordField
-                                                                        Layout.fillWidth: true
-                                                                        placeholderText: "Confirm New Password"
-                                                                        echoMode: TextInput.Password
-                                                                        font.family: fontFamily
-                                                                        font.pixelSize: 16
-                                                                        color: "#2c3e50"
-                                                                        background: Rectangle {
-                                                                            color: lightBackgroundColor
-                                                                            radius: 5
-                                                                        }
-                                                                    }
-
-                                                                    Button {
-                                                                        text: "Change Password"
-                                                                        Layout.fillWidth: true
-                                                                        onClicked: changePassword()
-                                                                        background: Rectangle {
-                                                                            color: accentColor
-                                                                            radius: 5
-                                                                        }
-                                                                        contentItem: Text {
-                                                                            text: parent.text
-                                                                            font.family: fontFamily
-                                                                            font.pixelSize: 16
-                                                                            color: "#172A45"
-                                                                            horizontalAlignment: Text.AlignHCenter
-                                                                            verticalAlignment: Text.AlignVCenter
-                                                                        }
-                                                                    }
-                                                                }
-
-                                                                // Delete Account Section
-                                                                ColumnLayout {
-                                                                    Layout.fillWidth: true
-                                                                    spacing: 10
-
-                                                                    Label {
-                                                                        text: "Delete Account"
-                                                                        font.family: fontFamily
-                                                                        font.pixelSize: 18
-                                                                        color: textColor
-                                                                    }
-
-                                                                    Text {
-                                                                        text: "Warning: This action cannot be undone. All your data will be permanently deleted."
-                                                                        font.family: fontFamily
-                                                                        font.pixelSize: 14
-                                                                        color: "red"
-                                                                        wrapMode: Text.Wrap
-                                                                        Layout.fillWidth: true
-                                                                    }
-
-                                                                    TextField {
-                                                                        id: deleteAccountPasswordField
-                                                                        Layout.fillWidth: true
-                                                                        placeholderText: "Enter your password to confirm"
-                                                                        echoMode: TextInput.Password
-                                                                        font.family: fontFamily
-                                                                        font.pixelSize: 16
-                                                                        color: "#2c3e50"
-                                                                        background: Rectangle {
-                                                                            color: lightBackgroundColor
-                                                                            radius: 5
-                                                                        }
-                                                                    }
-
-                                                                    Button {
-                                                                        text: "Delete Account"
-                                                                        Layout.fillWidth: true
-                                                                        onClicked: deleteAccount()
-                                                                        background: Rectangle {
-                                                                            color: "red"
-                                                                            radius: 5
-                                                                        }
-                                                                        contentItem: Text {
-                                                                            text: parent.text
-                                                                            font.family: fontFamily
-                                                                            font.pixelSize: 16
-                                                                            color: "white"
-                                                                            horizontalAlignment: Text.AlignHCenter
-                                                                            verticalAlignment: Text.AlignVCenter
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-
-                                            function newNote() {
-                                                titleField.text = ""
-                                                notesTextArea.text = ""
-                                                editingExistingNote = false
-                                                originalTitle = ""
-                                            }
-
-                                            function saveNote() {
-                                                if (titleField.text.trim() !== "") {
-                                                    var success;
-                                                    if (editingExistingNote) {
-                                                        success = dbManager.updateNote(currentUserId, originalTitle, titleField.text, notesTextArea.text);
-                                                        console.log("Note update attempt. Success:", success, "Title:", titleField.text);
-                                                    } else {
-                                                        success = dbManager.saveNote(currentUserId, titleField.text, notesTextArea.text);
-                                                        console.log("New note save attempt. Success:", success, "Title:", titleField.text);
-                                                    }
-                                                    loadNotes();
-                                                    titleField.text = "";
-                                                    notesTextArea.text = "";
-                                                    editingExistingNote = false;
-                                                    originalTitle = "";
-                                                }
-                                            }
-
-                                            function deleteNote() {
-                                                if (titleField.text.trim() !== "") {
-                                                    dbManager.deleteNote(currentUserId, titleField.text)
-                                                    loadNotes()
-                                                    titleField.text = ""
-                                                    notesTextArea.text = ""
-                                                    editingExistingNote = false
-                                                    originalTitle = ""
-                                                }
-                                            }
-
-                                            function recoverNote() {
-                                                if (titleField.text.trim() !== "") {
-                                                    dbManager.recoverNote(currentUserId, titleField.text)
-                                                    loadNotes()
-                                                    titleField.text = ""
-                                                    notesTextArea.text = ""
-                                                    editingExistingNote = false
-                                                    originalTitle = ""
-                                                }
-                                            }
-
-                                            function permanentlyDeleteNote() {
-                                                if (titleField.text.trim() !== "") {
-                                                    dbManager.permanentlyDeleteNote(currentUserId, titleField.text)
-                                                    loadNotes()
-                                                    titleField.text = ""
-                                                    notesTextArea.text = ""
-                                                    editingExistingNote = false
-                                                    originalTitle = ""
-                                                }
-                                            }
-
-                                            function emptyTrash() {
-                                                dbManager.emptyTrash(currentUserId)
-                                                loadNotes()
-                                            }
-
-                                            function loadNotes() {
-                                                console.log("Loading notes for user:", currentUserId);
-                                                savedFilesModel.clear();
-                                                deletedFilesModel.clear();
-                                                var notes = dbManager.getAllNotes(currentUserId);
-                                                var deletedNotes = dbManager.getDeletedNotes(currentUserId);
-                                                console.log("Received notes:", JSON.stringify(notes));
-                                                console.log("Received deleted notes:", JSON.stringify(deletedNotes));
-                                                for (var i = 0; i < notes.length; i++) {
-                                                    savedFilesModel.append(notes[i]);
-                                                    console.log("Appended saved note:", JSON.stringify(notes[i]));
-                                                }
-                                                for (var i = 0; i < deletedNotes.length; i++) {
-                                                    deletedFilesModel.append(deletedNotes[i]);
-                                                    console.log("Appended deleted note:", JSON.stringify(deletedNotes[i]));
-                                                }
-                                                console.log("Loaded", savedFilesModel.count, "saved notes and", deletedFilesModel.count, "deleted notes");
-                                            }
-
-                                            function saveTodoList() {
-                                                var todoItems = []
-                                                for (var i = 0; i < todoListModel.count; i++) {
-                                                    todoItems.push({
-                                                        task: todoListModel.get(i).task,
-                                                        completed: todoListModel.get(i).completed,
-                                                        priority: todoListModel.get(i).priority,
-                                                        deadline: todoListModel.get(i).deadline
-                                                    })
-                                                }
-                                                var todoListJson = JSON.stringify(todoItems)
-                                                console.log("Saving todo list:", todoListJson)
-                                                var success = dbManager.saveTodoList(currentUserId, todoListJson)
-                                                console.log("Todo list save " + (success ? "successful" : "failed"))
-                                            }
-
-                                            function loadTodoList() {
-                                                var todoListJson = dbManager.getTodoList(currentUserId)
-                                                console.log("Loaded todo list JSON:", todoListJson)
-                                                if (todoListJson) {
-                                                    try {
-                                                        var todoItems = JSON.parse(todoListJson)
-                                                        todoListModel.clear()
-                                                        for (var i = 0; i < todoItems.length; i++) {
-                                                            console.log("Adding item to model:", JSON.stringify(todoItems[i]))
-                                                            todoListModel.append(todoItems[i])
-                                                        }
-                                                        console.log("Todo list loaded successfully:", todoListModel.count, "items")
-                                                    } catch (e) {
-                                                        console.error("Error parsing todo list JSON:", e)
-                                                    }
-                                                } else {
-                                                    console.log("No todo list found for user")
-                                                }
-                                            }
-
-                                            function changePassword() {
-                                                if (newPasswordField.text !== confirmNewPasswordField.text) {
-                                                    showMessage("New passwords do not match.")
-                                                    return
-                                                }
-
-                                                if (dbManager.changePassword(currentUserId, currentPasswordField.text, newPasswordField.text)) {
-                                                    showMessage("Password changed successfully.")
-                                                    currentPasswordField.text = ""
-                                                    newPasswordField.text = ""
-                                                    confirmNewPasswordField.text = ""
-                                                } else {
-                                                    showMessage("Failed to change password. Please check your current password.")
-                                                }
-                                            }
-
-                                            function deleteAccount() {
-                                                if (dbManager.verifyPassword(currentUserId, deleteAccountPasswordField.text)) {
-                                                    if (dbManager.deleteAccount(currentUserId)) {
-                                                        showMessage("Account deleted successfully.")
-                                                        logOut()
-                                                    } else {
-                                                        showMessage("Failed to delete account. Please try again.")
-                                                    }
-                                                } else {
-                                                    showMessage("Incorrect password. Account deletion canceled.")
-                                                }
-                                                deleteAccountPasswordField.text = ""
-                                            }
-
-                                            function showMessage(message) {
-                                                // Implement a message dialog or toast notification here
-                                                console.log(message)
-                                            }
-
-                                            function logOut() {
-                                                saveTodoList() // Save todo list before logging out
-                                                savedFilesModel.clear()
-                                                deletedFilesModel.clear()
-                                                todoListModel.clear()
-                                                titleField.text = ""
-                                                notesTextArea.text = ""
-                                                editingExistingNote = false
-                                                originalTitle = ""
-
-                                                isLoggedIn = false
-                                                currentUserId = -1
-
-                                                stackView.push("LoginPage.qml", { dbManager: dbManager })
-                                            }
-
-                                            function onLoginSuccessful(userId) {
-                                                currentUserId = userId
-                                                isLoggedIn = true
-                                                loadNotes()
-                                                loadTodoList()
-                                            }
-
-                                            Component.onCompleted: {
-                                                console.log("MainWindow completed. isLoggedIn:", isLoggedIn, "currentUserId:", currentUserId);
-                                                if (isLoggedIn && currentUserId !== -1) {
-                                                    loadNotes();
-                                                    loadTodoList();
-                                                } else {
-                                                    stackView.replace("LoginPage.qml", { dbManager: dbManager });
-                                                }
-                                            }
+                                        background: Rectangle {
+                                            color: "transparent"
+                                            border.color: accentColor
+                                            border.width: 1
+                                            radius: 5
                                         }
+                                        contentItem: Text {
+                                            text: parent.text
+                                            font.family: fontFamily
+                                            font.pixelSize: 14
+                                            color: accentColor
+                                            horizontalAlignment: Text.AlignHCenter
+                                            verticalAlignment: Text.AlignVCenter
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Button {
+                        text: "Save To-Do List"
+                        Layout.alignment: Qt.AlignRight
+                        onClicked: saveTodoList()
+                        background: Rectangle {
+                            color: accentColor
+                            radius: 5
+                        }
+                        contentItem: Text {
+                            text: parent.text
+                            font.family: fontFamily
+                            font.pixelSize: 16
+                            color: "#172A45"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                    }
+                }
+            }
+
+            // About Me Page
+            Rectangle {
+                color: "#172A45"
+
+                RowLayout {
+                    anchors.fill: parent
+                    spacing: 20
+
+                    // Left side: User Info and Account Statistics
+                    ColumnLayout {
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: parent.width / 2
+                        Layout.margins: 20
+                        spacing: 20
+
+                        Label {
+                            text: "About Me"
+                            font.family: fontFamily
+                            font.pixelSize: 24
+                            color: accentColor
+                        }
+
+                        // User Info Section
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 10
+
+                            Label {
+                                text: "User Information"
+                                font.family: fontFamily
+                                font.pixelSize: 18
+                                color: textColor
+                            }
+
+                            Text {
+                                text: "Username: " + dbManager.getUsername(currentUserId)
+                                font.family: fontFamily
+                                font.pixelSize: 16
+                                color: textColor
+                            }
+
+                            Text {
+                                text: "Email: " + dbManager.getUserEmail(currentUserId)
+                                font.family: fontFamily
+                                font.pixelSize: 16
+                                color: textColor
+                            }
+                        }
+
+                        // Account Statistics Section
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 10
+
+                            Label {
+                                text: "Account Statistics"
+                                font.family: fontFamily
+                                font.pixelSize: 18
+                                color: textColor
+                            }
+
+                            Text {
+                                text: "Total Notes: " + dbManager.getTotalNotes(currentUserId)
+                                font.family: fontFamily
+                                font.pixelSize: 16
+                                color: textColor
+                            }
+
+                            Text {
+                                text: "Completed Tasks: " + dbManager.getCompletedTasks(currentUserId)
+                                font.family: fontFamily
+                                font.pixelSize: 16
+                                color: textColor
+                            }
+                        }
+                    }
+
+                    // Right side: Change Password and Delete Account
+                    ColumnLayout {
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: parent.width / 2
+                        Layout.margins: 20
+                        spacing: 20
+
+                        // Change Password Section
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 10
+
+                            Label {
+                                text: "Change Password"
+                                font.family: fontFamily
+                                font.pixelSize: 18
+                                color: textColor
+                            }
+
+                            TextField {
+                                id: currentPasswordField
+                                Layout.fillWidth: true
+                                placeholderText: "Current Password"
+                                echoMode: TextInput.Password
+                                font.family: fontFamily
+                                font.pixelSize: 16
+                                color: "#2c3e50"
+                                background: Rectangle {
+                                    color: lightBackgroundColor
+                                    radius: 5
+                                }
+                            }
+
+                            TextField {
+                                id: newPasswordField
+                                Layout.fillWidth: true
+                                placeholderText: "New Password"
+                                echoMode: TextInput.Password
+                                font.family: fontFamily
+                                font.pixelSize: 16
+                                color: "#2c3e50"
+                                background: Rectangle {
+                                    color: lightBackgroundColor
+                                    radius: 5
+                                }
+                            }
+
+                            TextField {
+                                id: confirmNewPasswordField
+                                Layout.fillWidth: true
+                                placeholderText: "Confirm New Password"
+                                echoMode: TextInput.Password
+                                font.family: fontFamily
+                                font.pixelSize: 16
+                                color: "#2c3e50"
+                                background: Rectangle {
+                                    color: lightBackgroundColor
+                                    radius: 5
+                                }
+                            }
+
+                            Button {
+                                text: "Change Password"
+                                Layout.fillWidth: true
+                                onClicked: changePassword()
+                                background: Rectangle {
+                                    color: accentColor
+                                    radius: 5
+                                }
+                                contentItem: Text {
+                                    text: parent.text
+                                    font.family: fontFamily
+                                    font.pixelSize: 16
+                                    color: "#172A45"
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                            }
+                        }
+
+                        // Delete Account Section
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 10
+
+                            Label {
+                                text: "Delete Account"
+                                font.family: fontFamily
+                                font.pixelSize: 18
+                                color: textColor
+                            }
+
+                            Text {
+                                text: "Warning: This action cannot be undone. All your data will be permanently deleted."
+                                font.family: fontFamily
+                                font.pixelSize: 14
+                                color: "red"
+                                wrapMode: Text.Wrap
+                                Layout.fillWidth: true
+                            }
+
+                            TextField {
+                                id: deleteAccountPasswordField
+                                Layout.fillWidth: true
+                                placeholderText: "Enter your password to confirm"
+                                echoMode: TextInput.Password
+                                font.family: fontFamily
+                                font.pixelSize: 16
+                                color: "#2c3e50"
+                                background: Rectangle {
+                                    color: lightBackgroundColor
+                                    radius: 5
+                                }
+                            }
+
+                            Button {
+                                text: "Delete Account"
+                                Layout.fillWidth: true
+                                onClicked: deleteAccount()
+                                background: Rectangle {
+                                    color: "red"
+                                    radius: 5
+                                }
+                                contentItem: Text {
+                                    text: parent.text
+                                    font.family: fontFamily
+                                    font.pixelSize: 16
+                                    color: "white"
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    function newNote() {
+        titleField.text = ""
+        notesTextArea.text = ""
+        editingExistingNote = false
+        originalTitle = ""
+    }
+
+    function saveNote() {
+        if (titleField.text.trim() !== "") {
+            var success;
+            if (editingExistingNote) {
+                success = dbManager.updateNote(currentUserId, originalTitle, titleField.text, notesTextArea.text);
+                console.log("Note update attempt. Success:", success, "Title:", titleField.text);
+            } else {
+                success = dbManager.saveNote(currentUserId, titleField.text, notesTextArea.text);
+                console.log("New note save attempt. Success:", success, "Title:", titleField.text);
+            }
+            loadNotes();
+            titleField.text = "";
+            notesTextArea.text = "";
+            editingExistingNote = false;
+            originalTitle = "";
+        }
+    }
+
+    function deleteNote() {
+        if (titleField.text.trim() !== "") {
+            dbManager.deleteNote(currentUserId, titleField.text)
+            loadNotes()
+            titleField.text = ""
+            notesTextArea.text = ""
+            editingExistingNote = false
+            originalTitle = ""
+        }
+    }
+
+    function recoverNote() {
+        if (titleField.text.trim() !== "") {
+            dbManager.recoverNote(currentUserId, titleField.text)
+            loadNotes()
+            titleField.text = ""
+            notesTextArea.text = ""
+            editingExistingNote = false
+            originalTitle = ""
+        }
+    }
+
+    function permanentlyDeleteNote() {
+        if (titleField.text.trim() !== "") {
+            dbManager.permanentlyDeleteNote(currentUserId, titleField.text)
+            loadNotes()
+            titleField.text = ""
+            notesTextArea.text = ""
+            editingExistingNote = false
+            originalTitle = ""
+        }
+    }
+
+    function emptyTrash() {
+        dbManager.emptyTrash(currentUserId)
+        loadNotes()
+    }
+
+    function loadNotes() {
+        console.log("Loading notes for user:", currentUserId);
+        savedFilesModel.clear();
+        deletedFilesModel.clear();
+        var notes = dbManager.getAllNotes(currentUserId);
+        var deletedNotes = dbManager.getDeletedNotes(currentUserId);
+        console.log("Received notes:", JSON.stringify(notes));
+        console.log("Received deleted notes:", JSON.stringify(deletedNotes));
+        for (var i = 0; i < notes.length; i++) {
+            savedFilesModel.append(notes[i]);
+            console.log("Appended saved note:", JSON.stringify(notes[i]));
+        }
+        for (var i = 0; i < deletedNotes.length; i++) {
+            deletedFilesModel.append(deletedNotes[i]);
+            console.log("Appended deleted note:", JSON.stringify(deletedNotes[i]));
+        }
+        console.log("Loaded", savedFilesModel.count, "saved notes and", deletedFilesModel.count, "deleted notes");
+    }
+
+    function saveTodoList() {
+        var todoItems = []
+        for (var i = 0; i < todoListModel.count; i++) {
+            todoItems.push({
+                task: todoListModel.get(i).task,
+                completed: todoListModel.get(i).completed,
+                priority: todoListModel.get(i).priority,
+                deadline: todoListModel.get(i).deadline
+            })
+        }
+        var todoListJson = JSON.stringify(todoItems)
+        console.log("Saving todo list:", todoListJson)
+        var success = dbManager.saveTodoList(currentUserId, todoListJson)
+        console.log("Todo list save " + (success ? "successful" : "failed"))
+    }
+
+    function loadTodoList() {
+        var todoListJson = dbManager.getTodoList(currentUserId)
+        console.log("Loaded todo list JSON:", todoListJson)
+        if (todoListJson) {
+            try {
+                var todoItems = JSON.parse(todoListJson)
+                todoListModel.clear()
+                for (var i = 0; i < todoItems.length; i++) {
+                    console.log("Adding item to model:", JSON.stringify(todoItems[i]))
+                    todoListModel.append(todoItems[i])
+                }
+                console.log("Todo list loaded successfully:", todoListModel.count, "items")
+            } catch (e) {
+                console.error("Error parsing todo list JSON:", e)
+            }
+        } else {
+            console.log("No todo list found for user")
+        }
+    }
+
+    function changePassword() {
+        if (newPasswordField.text !== confirmNewPasswordField.text) {
+            showMessage("New passwords do not match.")
+            return
+        }
+
+        if (dbManager.changePassword(currentUserId, currentPasswordField.text, newPasswordField.text)) {
+            showMessage("Password changed successfully.")
+            currentPasswordField.text = ""
+            newPasswordField.text = ""
+            confirmNewPasswordField.text = ""
+        } else {
+            showMessage("Failed to change password. Please check your current password.")
+        }
+    }
+
+    function deleteAccount() {
+        if (dbManager.verifyPassword(currentUserId, deleteAccountPasswordField.text)) {
+            if (dbManager.deleteAccount(currentUserId)) {
+                showMessage("Account deleted successfully.")
+                logOut()
+            } else {
+                showMessage("Failed to delete account. Please try again.")
+            }
+        } else {
+            showMessage("Incorrect password. Account deletion canceled.")
+        }
+        deleteAccountPasswordField.text = ""
+    }
+
+    function showMessage(message) {
+        // Implement a message dialog or toast notification here
+        console.log(message)
+    }
+
+    function logOut() {
+        savedFilesModel.clear()
+        deletedFilesModel.clear()
+        todoListModel.clear()
+        titleField.text = ""
+        notesTextArea.text = ""
+        editingExistingNote = false
+        originalTitle = ""
+
+        isLoggedIn = false
+        currentUserId = -1
+
+        stackView.push("LoginPage.qml", { dbManager: dbManager })
+    }
+
+    function onLoginSuccessful(userId) {
+        currentUserId = userId
+        isLoggedIn = true
+        loadNotes()
+        loadTodoList()
+    }
+
+    Component.onCompleted: {
+        console.log("MainWindow completed. isLoggedIn:", isLoggedIn, "currentUserId:", currentUserId);
+        if (isLoggedIn && currentUserId !== -1) {
+            loadNotes();
+            loadTodoList();
+        } else {
+            stackView.replace("LoginPage.qml", { dbManager: dbManager });
+        }
+    }
+}

@@ -126,7 +126,6 @@ ApplicationWindow {
         }
     }
 
-    // Custom button component
     component CustomButton: Button {
         property bool outlined: false
 

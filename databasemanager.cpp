@@ -277,38 +277,45 @@ bool DatabaseManager::saveTodoList(int userId, const QString &todoListJson)
         return false;
     }
 
-    // First, delete existing todo items for this user
-    QSqlQuery deleteQuery(m_db);
-    deleteQuery.prepare("DELETE FROM todolist WHERE user_id = :userId");
-    deleteQuery.bindValue(":userId", userId);
-    if (!deleteQuery.exec()) {
-        qDebug() << "Error deleting old todo items:" << deleteQuery.lastError().text();
-        return false;
-    }
-
-    // Parse the JSON and insert new items
     QJsonDocument jsonDoc = QJsonDocument::fromJson(todoListJson.toUtf8());
     QJsonArray todoArray = jsonDoc.array();
 
+    m_db.transaction();
+
     QSqlQuery insertQuery(m_db);
     insertQuery.prepare("INSERT INTO todolist (user_id, task, completed, priority, deadline) "
-                        "VALUES (:userId, :task, :completed, :priority, :deadline)");
+                        "VALUES (?, ?, ?, ?, ?)");
 
     for (const QJsonValue &value : todoArray) {
         QJsonObject item = value.toObject();
-        insertQuery.bindValue(":userId", userId);
-        insertQuery.bindValue(":task", item["task"].toString());
-        insertQuery.bindValue(":completed", item["completed"].toBool());
-        insertQuery.bindValue(":priority", item["priority"].toString());
-        insertQuery.bindValue(":deadline", item["deadline"].toString());
+        insertQuery.addBindValue(userId);
+        insertQuery.addBindValue(item["task"].toString());
+        insertQuery.addBindValue(item["completed"].toBool());
+        insertQuery.addBindValue(item["priority"].toString());
+        insertQuery.addBindValue(item["deadline"].toString());
 
         if (!insertQuery.exec()) {
             qDebug() << "Error inserting todo item:" << insertQuery.lastError().text();
+            qDebug() << "Failed query:" << insertQuery.lastQuery();
+            qDebug() << "Bound values:" << insertQuery.boundValues();
+
+            QVariantList boundValues = insertQuery.boundValues();
+            for (int i = 0; i < boundValues.size(); ++i) {
+                qDebug() << "Value" << i << ":" << boundValues[i].typeName() << "-" << boundValues[i].toString();
+            }
+
+            m_db.rollback();
             return false;
         }
     }
 
-    qDebug() << "Todo list saved for user" << userId;
+    if (!m_db.commit()) {
+        qDebug() << "Error committing transaction:" << m_db.lastError().text();
+        m_db.rollback();
+        return false;
+    }
+
+    qDebug() << "Todo list saved successfully for user" << userId;
     return true;
 }
 
@@ -325,6 +332,8 @@ QString DatabaseManager::getTodoList(int userId)
 
     if (!query.exec()) {
         qDebug() << "Error fetching todo items:" << query.lastError().text();
+        qDebug() << "Failed query:" << query.lastQuery();
+        qDebug() << "Bound values:" << query.boundValues();
         return QString();
     }
 
@@ -339,7 +348,15 @@ QString DatabaseManager::getTodoList(int userId)
     }
 
     QJsonDocument jsonDoc(todoArray);
-    return QString(jsonDoc.toJson());
+    QString result = QString(jsonDoc.toJson());
+
+    if (todoArray.isEmpty()) {
+        qDebug() << "No todo items found for user" << userId;
+    } else {
+        qDebug() << "Retrieved" << todoArray.size() << "todo items for user" << userId;
+    }
+
+    return result;
 }
 
 bool DatabaseManager::ensureNotesTableStructure()
@@ -383,6 +400,159 @@ bool DatabaseManager::permanentlyDeleteNote(int userId, const QString &title)
         qDebug() << "Error permanently deleting note:" << query.lastError().text();
         return false;
     }
-    qDebug() << "Note permanently deleted for user" << userId << "with title:" << title;
     return true;
+}
+
+QString DatabaseManager::getUsername(int userId)
+{
+    if (!openDatabase()) {
+        qDebug() << "Database is not open";
+        return QString();
+    }
+    QSqlQuery query(m_db);
+    query.prepare("SELECT name FROM users WHERE id = :userId");
+    query.bindValue(":userId", userId);
+    if (!query.exec()) {
+        qDebug() << "Error fetching username:" << query.lastError().text();
+        return QString();
+    }
+    if (query.next()) {
+        return query.value(0).toString();
+    }
+    return QString();
+}
+
+QString DatabaseManager::getUserEmail(int userId)
+{
+    if (!openDatabase()) {
+        qDebug() << "Database is not open";
+        return QString();
+    }
+    QSqlQuery query(m_db);
+    query.prepare("SELECT email FROM users WHERE id = :userId");
+    query.bindValue(":userId", userId);
+    if (!query.exec()) {
+        qDebug() << "Error fetching user email:" << query.lastError().text();
+        return QString();
+    }
+    if (query.next()) {
+        return query.value(0).toString();
+    }
+    return QString();
+}
+
+bool DatabaseManager::changePassword(int userId, const QString &currentPassword, const QString &newPassword)
+{
+    if (!openDatabase()) {
+        qDebug() << "Database is not open";
+        return false;
+    }
+    QSqlQuery query(m_db);
+    query.prepare("UPDATE users SET password = :newPassword WHERE id = :userId AND password = :currentPassword");
+    query.bindValue(":userId", userId);
+    query.bindValue(":currentPassword", currentPassword);
+    query.bindValue(":newPassword", newPassword);
+    if (!query.exec()) {
+        qDebug() << "Error changing password:" << query.lastError().text();
+        return false;
+    }
+    return query.numRowsAffected() > 0;
+}
+
+bool DatabaseManager::deleteAccount(int userId)
+{
+    if (!openDatabase()) {
+        qDebug() << "Database is not open";
+        return false;
+    }
+    m_db.transaction();
+    QSqlQuery query(m_db);
+
+    // Delete user's notes
+    query.prepare("DELETE FROM notes WHERE user_id = :userId");
+    query.bindValue(":userId", userId);
+    if (!query.exec()) {
+        qDebug() << "Error deleting user's notes:" << query.lastError().text();
+        m_db.rollback();
+        return false;
+    }
+
+    // Delete user's todo items
+    query.prepare("DELETE FROM todolist WHERE user_id = :userId");
+    query.bindValue(":userId", userId);
+    if (!query.exec()) {
+        qDebug() << "Error deleting user's todo items:" << query.lastError().text();
+        m_db.rollback();
+        return false;
+    }
+
+    // Delete user account
+    query.prepare("DELETE FROM users WHERE id = :userId");
+    query.bindValue(":userId", userId);
+    if (!query.exec()) {
+        qDebug() << "Error deleting user account:" << query.lastError().text();
+        m_db.rollback();
+        return false;
+    }
+
+    m_db.commit();
+    return true;
+}
+
+int DatabaseManager::getTotalNotes(int userId)
+{
+    if (!openDatabase()) {
+        qDebug() << "Database is not open";
+        return 0;
+    }
+    QSqlQuery query(m_db);
+    query.prepare("SELECT COUNT(*) FROM notes WHERE user_id = :userId AND is_deleted = 0");
+    query.bindValue(":userId", userId);
+    if (!query.exec()) {
+        qDebug() << "Error counting notes:" << query.lastError().text();
+        return 0;
+    }
+    if (query.next()) {
+        return query.value(0).toInt();
+    }
+    return 0;
+}
+
+int DatabaseManager::getCompletedTasks(int userId)
+{
+    if (!openDatabase()) {
+        qDebug() << "Database is not open";
+        return 0;
+    }
+    QSqlQuery query(m_db);
+    query.prepare("SELECT COUNT(*) FROM todolist WHERE user_id = :userId AND completed = 1");
+    query.bindValue(":userId", userId);
+    if (!query.exec()) {
+        qDebug() << "Error counting completed tasks:" << query.lastError().text();
+        return 0;
+    }
+    if (query.next()) {
+        return query.value(0).toInt();
+    }
+    return 0;
+}
+
+bool DatabaseManager::verifyPassword(int userId, const QString &password)
+{
+    if (!openDatabase()) {
+        qDebug() << "Database is not open";
+        return false;
+    }
+    QSqlQuery query(m_db);
+    query.prepare("SELECT COUNT(*) FROM users WHERE id = :userId AND password = :password");
+    query.bindValue(":userId", userId);
+    query.bindValue(":password", password);
+    if (!query.exec()) {
+        qDebug() << "Error verifying password:" << query.lastError().text();
+        return false;
+    }
+    if (query.next()) {
+        return query.value(0).toInt() > 0;
+    }
+    return false;
 }

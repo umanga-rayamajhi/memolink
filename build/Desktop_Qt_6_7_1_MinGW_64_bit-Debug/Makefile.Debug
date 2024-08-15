@@ -224,6 +224,23 @@ debug/moc_databasemanager.cpp: ../../databasemanager.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtSql/qtsqlglobal.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtSql/qtsql-config.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtSql/qtsqlexports.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QVariantList \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qvariantlist.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QList \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QVariant \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qvariant.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qdebug.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qtextstream.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qcontiguouscache.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qsharedpointer.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qshareddata.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qsharedpointer_impl.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qmap.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qshareddata_impl.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qset.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qhash.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qvarlengtharray.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/q23utility.h \
 		debug/moc_predefs.h \
 		../../../../Qt/6.7.1/mingw_64/bin/moc.exe
 	C:\Qt\6.7.1\mingw_64\bin\moc.exe $(DEFINES) --include C:/umanga/memolink/build/Desktop_Qt_6_7_1_MinGW_64_bit-Debug/debug/moc_predefs.h -IC:/Qt/6.7.1/mingw_64/mkspecs/win32-g++ -IC:/umanga/memolink -IC:/Qt/6.7.1/mingw_64/include -IC:/Qt/6.7.1/mingw_64/include/QtQuick -IC:/Qt/6.7.1/mingw_64/include/QtOpenGL -IC:/Qt/6.7.1/mingw_64/include/QtWidgets -IC:/Qt/6.7.1/mingw_64/include/QtGui -IC:/Qt/6.7.1/mingw_64/include/QtQmlModels -IC:/Qt/6.7.1/mingw_64/include/QtQml -IC:/Qt/6.7.1/mingw_64/include/QtQmlIntegration -IC:/Qt/6.7.1/mingw_64/include/QtNetwork -IC:/Qt/6.7.1/mingw_64/include/QtSql -IC:/Qt/6.7.1/mingw_64/include/QtCore -I. -IC:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++ -IC:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32 -IC:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/backward -IC:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include -IC:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include-fixed -IC:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include ..\..\databasemanager.h -o debug\moc_databasemanager.cpp
@@ -352,23 +369,16 @@ debug/databasemanager.o: ../../databasemanager.cpp ../../databasemanager.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtSql/qtsqlglobal.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtSql/qtsql-config.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtSql/qtsqlexports.h \
-		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QStandardPaths \
-		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qstandardpaths.h \
-		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QDir \
-		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qdir.h \
-		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qfile.h \
-		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qfiledevice.h \
-		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qiodevice.h \
-		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qfileinfo.h \
-		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qshareddata.h \
-		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qdatetime.h \
-		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qcalendar.h \
-		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qlocale.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QVariantList \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qvariantlist.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QList \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QVariant \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qvariant.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qdebug.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qtextstream.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qcontiguouscache.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qsharedpointer.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qshareddata.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qsharedpointer_impl.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qmap.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qshareddata_impl.h \
@@ -376,14 +386,36 @@ debug/databasemanager.o: ../../databasemanager.cpp ../../databasemanager.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qhash.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qvarlengtharray.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/q23utility.h \
-		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qtimezone.h \
-		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QDebug \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtSql/QSqlQuery \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtSql/qsqlquery.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtSql/QSqlError \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtSql/qsqlerror.h \
-		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QCryptographicHash \
-		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qcryptographichash.h
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QDebug \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QDir \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qdir.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qfile.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qfiledevice.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qiodevice.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qfileinfo.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qdatetime.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qcalendar.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qlocale.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qtimezone.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QStandardPaths \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qstandardpaths.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QJsonDocument \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qjsondocument.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qjsonvalue.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qcborvalue.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qcborcommon.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qregularexpression.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qurl.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/quuid.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qendian.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QJsonArray \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qjsonarray.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QJsonObject \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qjsonobject.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\databasemanager.o ..\..\databasemanager.cpp
 
 debug/main.o: ../../main.cpp ../../../../../../Qt/6.7.1/mingw_64/include/QtGui/QGuiApplication \
@@ -562,14 +594,17 @@ debug/main.o: ../../main.cpp ../../../../../../Qt/6.7.1/mingw_64/include/QtGui/Q
 		../../../../../../Qt/6.7.1/mingw_64/include/QtQml/qqmlabstracturlinterceptor.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtQml/QQmlContext \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtQml/qqmlcontext.h \
-		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QDebug \
 		../../databasemanager.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QObject \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtSql/QSqlDatabase \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtSql/qsqldatabase.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtSql/qtsqlglobal.h \
 		../../../../../../Qt/6.7.1/mingw_64/include/QtSql/qtsql-config.h \
-		../../../../../../Qt/6.7.1/mingw_64/include/QtSql/qtsqlexports.h
+		../../../../../../Qt/6.7.1/mingw_64/include/QtSql/qtsqlexports.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QVariantList \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/qvariantlist.h \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QList \
+		../../../../../../Qt/6.7.1/mingw_64/include/QtCore/QVariant
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\main.o ..\..\main.cpp
 
 debug/qrc_Resources.o: debug/qrc_Resources.cpp 

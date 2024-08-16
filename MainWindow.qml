@@ -623,12 +623,12 @@ Page {
                                 color: textColor
                             }
 
-                            Text {
-                                text: "Completed Tasks: " + dbManager.getCompletedTasks(currentUserId)
-                                font.family: fontFamily
-                                font.pixelSize: 16
-                                color: textColor
-                            }
+                            // Text {
+                            //     text: "Completed Tasks: " + dbManager.getCompletedTasks(currentUserId)
+                            //     font.family: fontFamily
+                            //     font.pixelSize: 16
+                            //     color: textColor
+                            // }
                         }
                     }
 
@@ -783,10 +783,8 @@ Page {
             var success;
             if (editingExistingNote) {
                 success = dbManager.updateNote(currentUserId, originalTitle, titleField.text, notesTextArea.text);
-                console.log("Note update attempt. Success:", success, "Title:", titleField.text);
             } else {
                 success = dbManager.saveNote(currentUserId, titleField.text, notesTextArea.text);
-                console.log("New note save attempt. Success:", success, "Title:", titleField.text);
             }
             loadNotes();
             titleField.text = "";
@@ -835,22 +833,16 @@ Page {
     }
 
     function loadNotes() {
-        console.log("Loading notes for user:", currentUserId);
         savedFilesModel.clear();
         deletedFilesModel.clear();
         var notes = dbManager.getAllNotes(currentUserId);
         var deletedNotes = dbManager.getDeletedNotes(currentUserId);
-        console.log("Received notes:", JSON.stringify(notes));
-        console.log("Received deleted notes:", JSON.stringify(deletedNotes));
         for (var i = 0; i < notes.length; i++) {
             savedFilesModel.append(notes[i]);
-            console.log("Appended saved note:", JSON.stringify(notes[i]));
         }
         for (var i = 0; i < deletedNotes.length; i++) {
             deletedFilesModel.append(deletedNotes[i]);
-            console.log("Appended deleted note:", JSON.stringify(deletedNotes[i]));
         }
-        console.log("Loaded", savedFilesModel.count, "saved notes and", deletedFilesModel.count, "deleted notes");
     }
 
     function saveTodoList() {
@@ -864,9 +856,7 @@ Page {
             })
         }
         var todoListJson = JSON.stringify(todoItems)
-        console.log("Saving todo list:", todoListJson)
         var success = dbManager.saveTodoList(currentUserId, todoListJson)
-        console.log("Todo list save " + (success ? "successful" : "failed"))
     }
 
     function loadTodoList() {
